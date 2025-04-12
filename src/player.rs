@@ -18,7 +18,7 @@ pub struct Player{
 }
 
 fn setup_player(mut commands : Commands, assets_server : Res<AssetServer>, resolution : Res<resolution::Resolution>) {
-    let player_texture = assets_server.load("Player/Tank_Gelb.png");
+    let player_texture = assets_server.load("player/tank_yellow.png");
     commands.spawn(
         (
             Sprite::from_image(player_texture), 

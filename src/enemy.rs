@@ -22,7 +22,7 @@ pub struct Enemy{
 
 
 fn setup_enemies(mut commands : Commands, assets_server : Res<AssetServer>, resolution : Res<resolution::Resolution>) {
-    let enemy_texture = assets_server.load("Player/Tank_Pink.png");
+    let enemy_texture = assets_server.load("player/tank_pink.png");
     commands.spawn(
         (
             Sprite::from_image(enemy_texture), 
