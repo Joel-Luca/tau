@@ -1,5 +1,6 @@
 use bevy::prelude::*;
 
+pub mod configuration;
 pub mod enemy;
 pub mod game;
 pub mod player;
@@ -13,7 +14,7 @@ fn main() {
                 DefaultPlugins
                 .set(WindowPlugin{
                     primary_window : Some(Window{
-                        title : String::from("Hello World!"), 
+                        title : String::from("Tau"), 
                         position : WindowPosition::Centered(MonitorSelection::Primary),
                         ..Default::default()
                     }),
