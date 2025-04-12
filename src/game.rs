@@ -1,5 +1,6 @@
 use bevy::prelude::*;
 
+use crate::configuration;
 use crate::enemy;
 use crate::player;
 use crate::projectile;
@@ -12,6 +13,7 @@ impl Plugin for GamePlugin{
         app
             .add_plugins(
                 (
+                    configuration::ConfigurationPlugin,
                     enemy::EnemyPlugin,
                     player::PlayerPlugin,
                     projectile::ProjectilePlugin,

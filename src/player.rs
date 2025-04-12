@@ -1,5 +1,6 @@
 use bevy::prelude::*;
 
+use crate::configuration;
 use crate::resolution;
 
 pub struct PlayerPlugin; 
@@ -13,30 +14,24 @@ impl Plugin for PlayerPlugin{
 }
 
 #[derive(Component)]
-pub struct Player{
-    pub shoot_timer : f32, 
-}
+pub struct Player{}
 
 fn setup_player(mut commands : Commands, assets_server : Res<AssetServer>, resolution : Res<resolution::Resolution>) {
     let player_texture = assets_server.load("player/tank_yellow.png");
     commands.spawn(
         (
             Sprite::from_image(player_texture), 
-            Transform::from_xyz(0., resolution.screen_dimensions.y * 0.5, 0.).with_scale(Vec3::splat(resolution.pixel_ratio)),
-            Player {
-                shoot_timer : 0.,
-            }
+            Transform::from_translation(Vec3::new(0., 0., 0.)).with_scale(Vec3::splat(resolution.pixel_ratio)),
+            Player{}
         )
     );
 }
-
-const MOVE_SPEED : f32 = 100.;
-const ROTATION_SPEED : f32 = 5.;
 
 fn update_player(
     mut transform_query : Query<&mut Transform, With<Player>>,
     time : Res<Time>,
     keys : Res<ButtonInput<KeyCode>>,
+    configuration : Res<configuration::Configuration>
 )
 {
     let mut transform = transform_query.single_mut();
@@ -60,11 +55,10 @@ fn update_player(
         movement -= 1.;
     }
 
-    transform.rotate_z(rotation * ROTATION_SPEED * time.delta_secs());
+    transform.rotate_z(rotation * configuration.rotation_speed * time.delta_secs());
 
     let direction = transform.rotation * Vec3::Y;
-    let distance = movement * MOVE_SPEED * time.delta_secs();
+    let distance = movement * configuration.move_speed * time.delta_secs();
 
     transform.translation += direction * distance;
-
 }
