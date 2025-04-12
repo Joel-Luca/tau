@@ -1,5 +1,6 @@
 use bevy::prelude::*;
 
+use crate::bullet;
 use crate::configuration;
 use crate::enemy;
 use crate::player;
@@ -14,6 +15,7 @@ impl Plugin for GamePlugin{
         app
             .add_plugins(
                 (
+                    bullet::BulletPlugin,
                     configuration::ConfigurationPlugin,
                     enemy::EnemyPlugin,
                     player::PlayerPlugin,

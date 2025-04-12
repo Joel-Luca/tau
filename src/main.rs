@@ -1,5 +1,7 @@
 use bevy::prelude::*;
 
+pub mod bullet;
+pub mod collision;
 pub mod configuration;
 pub mod enemy;
 pub mod game;
