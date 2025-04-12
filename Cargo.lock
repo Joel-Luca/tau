@@ -3666,13 +3666,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6eae92052b72ef70dafa16eddbabffc77e5ca3574be2f7bc1127b36f0a7ad7f2"
 
 [[package]]
-name = "start-bevy"
-version = "0.1.0"
-dependencies = [
- "bevy",
-]
-
-[[package]]
 name = "static_assertions"
 version = "1.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3739,6 +3732,13 @@ dependencies = [
  "num-traits",
  "serde",
  "slotmap",
+]
+
+[[package]]
+name = "tau"
+version = "0.1.0"
+dependencies = [
+ "bevy",
 ]
 
 [[package]]
