@@ -1,7 +1,8 @@
 use bevy::prelude::*;
 
-use crate::configuration;
-use crate::resolution;
+use crate::configuration::*;
+use crate::resolution::*;
+use crate::tank::*;
 
 pub struct PlayerPlugin; 
 
@@ -9,29 +10,30 @@ impl Plugin for PlayerPlugin{
     fn build(&self, app: &mut App) {
         app
         .add_systems(Startup, setup_player)
-        .add_systems(Update, update_player);
+        .add_systems(Update, move_player);
     }
 }
-
+ 
 #[derive(Component)]
 pub struct Player{}
 
-fn setup_player(mut commands : Commands, assets_server : Res<AssetServer>, resolution : Res<resolution::Resolution>) {
+
+fn setup_player(mut commands : Commands, assets_server : Res<AssetServer>, resolution : Res<Resolution>) {
     let player_texture = assets_server.load("player/tank_yellow.png");
+    let spawn_location = Transform::from_translation(Vec3::new(0., 0., 0.)).with_scale(Vec3::splat(resolution.pixel_ratio));
     commands.spawn(
         (
-            Sprite::from_image(player_texture), 
-            Transform::from_translation(Vec3::new(0., 0., 0.)).with_scale(Vec3::splat(resolution.pixel_ratio)),
-            Player{}
+            Player{},
+            TankBunlde::new(spawn_location, Sprite::from_image(player_texture)),
         )
     );
 }
 
-fn update_player(
+fn move_player(
     mut transform_query : Query<&mut Transform, With<Player>>,
     time : Res<Time>,
     keys : Res<ButtonInput<KeyCode>>,
-    configuration : Res<configuration::Configuration>
+    configuration : Res<Configuration>
 )
 {
     let mut transform = transform_query.single_mut();

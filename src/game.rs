@@ -5,6 +5,7 @@ use crate::enemy;
 use crate::player;
 use crate::projectile;
 use crate::resolution;
+use crate::tank;
 
 pub struct GamePlugin; 
 
@@ -17,7 +18,8 @@ impl Plugin for GamePlugin{
                     enemy::EnemyPlugin,
                     player::PlayerPlugin,
                     projectile::ProjectilePlugin,
-                    resolution::ResolutionPlugin
+                    resolution::ResolutionPlugin,
+                    tank::TankPlugin,
                 )
             )
             .add_systems(Startup, setup_scene);

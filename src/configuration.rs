@@ -12,12 +12,14 @@ impl Plugin for ConfigurationPlugin{
 pub struct Configuration{
     pub move_speed : f32,
     pub rotation_speed : f32,
+    pub spawn_protection : f32,
 }
 
 fn setup_configration(mut commands : Commands) {
     commands.insert_resource(Configuration{
         move_speed : 200.,
         rotation_speed: 3.,
+        spawn_protection: 3.,
     })
 }
 
