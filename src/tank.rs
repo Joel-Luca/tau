@@ -1,6 +1,5 @@
 use bevy::prelude::*;
 
-use crate::projectile::*;
 use crate::collision::*;
 
 use crate::configuration;
@@ -47,14 +46,4 @@ fn check_spawn_protection(mut tank_query : Query<&mut Tank>, time : Res<Time>, c
             tank.killable = true;
         }
     }
-}
-
-fn check_for_collision(
-    mut commands: Commands,
-    projectile_query: Query<(&mut Velocity, &Transform), With<Projectile>>,
-    collider_query: Query<(Entity, &Transform, Option<&Brick>), With<Collider>>,
-    mut collision_events: EventWriter<CollisionEvent>,
-) 
-{
-
 }

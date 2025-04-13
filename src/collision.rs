@@ -5,4 +5,4 @@ use bevy::prelude::*;
 pub struct Collider;
 
 #[derive(Event, Default)]
-struct CollisionEvent;
+pub struct CollisionEvent;
