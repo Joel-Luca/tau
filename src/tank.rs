@@ -23,16 +23,16 @@ pub struct Tank{
 }
 
 #[derive(Bundle)]
-pub struct TankBunlde{
+pub struct TankBundle{
     collider: Collider,
     sprite: Sprite,
     tank: Tank, 
     transform: Transform,
 }
 
-impl TankBunlde {
-    pub fn new(spawn_location: Transform, sprite: Sprite) -> TankBunlde {
-        TankBunlde {
+impl TankBundle {
+    pub fn new(spawn_location: Transform, sprite: Sprite) -> TankBundle {
+        TankBundle {
             collider: Collider{},
             sprite,
             tank: Tank { deaths: 0, killable: false, last_time_killed: 0., spawn_location:spawn_location },

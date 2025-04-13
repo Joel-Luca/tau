@@ -24,7 +24,7 @@ fn setup_player(mut commands : Commands, assets_server : Res<AssetServer>, resol
     commands.spawn(
         (
             Player{},
-            TankBunlde::new(spawn_location, Sprite::from_image(player_texture)),
+            TankBundle::new(spawn_location, Sprite::from_image(player_texture)),
         )
     );
 }
