@@ -10,7 +10,7 @@ pub struct TankPlugin;
 impl Plugin for TankPlugin{
     fn build(&self, app: &mut App) {
         app
-        .add_systems(Update, check_spwan_protection);
+        .add_systems(Update, check_spawn_protection);
     }
 }
 
@@ -41,7 +41,7 @@ impl TankBundle {
     }
 }
 
-fn check_spwan_protection(mut tank_query : Query<&mut Tank>, time : Res<Time>, configuration : Res<configuration::Configuration>) {
+fn check_spawn_protection(mut tank_query : Query<&mut Tank>, time : Res<Time>, configuration : Res<configuration::Configuration>) {
     for mut tank in &mut tank_query {
         if time.delta_secs() > tank.last_time_killed + configuration.spawn_protection && tank.killable == false {
             tank.killable = true;
