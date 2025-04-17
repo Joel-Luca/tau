@@ -17,7 +17,7 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - name: Install dependencies
-      run: sudo apt-get install -yqq libudev-dev alsa
+      run: sudo apt-get install -yqq libudev-dev alsa-sys
     - name: Build
       run: cargo build --verbose
     - name: Run tests
