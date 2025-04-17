@@ -4,7 +4,7 @@ pub struct ConfigurationPlugin;
 
 impl Plugin for ConfigurationPlugin{
     fn build(&self, app: &mut App) {
-        app.add_systems(PreStartup, setup_configration);
+        app.add_systems(PreStartup, setup_configuration);
     } 
 }
 
@@ -15,7 +15,7 @@ pub struct Configuration{
     pub spawn_protection : f32,
 }
 
-fn setup_configration(mut commands : Commands) {
+fn setup_configuration(mut commands : Commands) {
     commands.insert_resource(Configuration{
         move_speed : 200.,
         rotation_speed: 3.,
