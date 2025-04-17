@@ -1,7 +1,8 @@
 use bevy::prelude::*;
 
+
+use crate::physic::velocity::*;
 use crate::projectile::*;
-use crate::velocity::*;
 
 pub struct BulletPlugin; 
 

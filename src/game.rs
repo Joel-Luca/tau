@@ -1,13 +1,12 @@
 use bevy::prelude::*;
 
-use crate::bullet;
+
 use crate::configuration;
 use crate::enemy;
+use crate::physic;
 use crate::player;
 use crate::projectile;
-use crate::resolution;
 use crate::tank;
-use crate::velocity;
 
 pub struct GamePlugin; 
 
@@ -16,14 +15,12 @@ impl Plugin for GamePlugin{
         app
             .add_plugins(
                 (
-                    bullet::BulletPlugin,
                     configuration::ConfigurationPlugin,
                     enemy::EnemyPlugin,
                     player::PlayerPlugin,
+                    physic::PhysicPlugin,
                     projectile::ProjectilePlugin,
-                    resolution::ResolutionPlugin,
                     tank::TankPlugin,
-                    velocity::VelocityPlugin,
                 )
             )
             .add_systems(Startup, setup_scene);

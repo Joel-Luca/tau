@@ -1,6 +1,7 @@
 use bevy::prelude::*;
 
-use crate::resolution;
+
+use crate::configuration::resolution::*;
 
 pub struct EnemyPlugin; 
 
@@ -21,7 +22,7 @@ pub struct Enemy{
 }
 
 
-fn setup_enemies(mut commands : Commands, assets_server : Res<AssetServer>, resolution : Res<resolution::Resolution>) {
+fn setup_enemies(mut commands : Commands, assets_server : Res<AssetServer>, resolution : Res<Resolution>) {
     let enemy_texture = assets_server.load("player/tank_pink.png");
     commands.spawn(
         (

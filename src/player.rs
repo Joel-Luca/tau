@@ -1,7 +1,8 @@
 use bevy::prelude::*;
 
+
 use crate::configuration::*;
-use crate::resolution::*;
+use crate::configuration::resolution::*;
 use crate::tank::*;
 
 pub struct PlayerPlugin; 

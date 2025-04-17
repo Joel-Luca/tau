@@ -1,5 +1,6 @@
 use bevy::prelude::*;
 
+
 pub struct ResolutionPlugin;
 
 impl Plugin for ResolutionPlugin{

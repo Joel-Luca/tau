@@ -1,15 +1,13 @@
 use bevy::prelude::*;
 
-pub mod bullet;
-pub mod collision;
+
 pub mod configuration;
 pub mod enemy;
 pub mod game;
+pub mod physic;
 pub mod player;
 pub mod projectile;
-pub mod resolution;
 pub mod tank;
-pub mod velocity;
 
 fn main() {
     App::new()

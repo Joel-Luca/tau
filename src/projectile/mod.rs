@@ -1,15 +1,20 @@
 use bevy::prelude::*;
 
-use crate::collision::*;
+
+pub mod bullet;
+
 use crate::enemy;
+use crate::physic::collision::*;
+use crate::physic::velocity::*;
 use crate::tank::*;
-use crate::velocity::*;
 
 pub struct ProjectilePlugin; 
 
 impl Plugin for ProjectilePlugin{
     fn build(&self, app: &mut App) {
-        app.add_systems(FixedUpdate, check_for_collisions);
+        app
+        .add_plugins(bullet::BulletPlugin)
+        .add_systems(FixedUpdate, check_for_collisions);
     }
 }
 

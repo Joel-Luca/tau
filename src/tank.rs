@@ -1,7 +1,9 @@
 use bevy::prelude::*;
 
-use crate::collision::*;
+
 use crate::configuration::*;
+use crate::physic::collision::*;
+
 
 pub struct TankPlugin; 
 

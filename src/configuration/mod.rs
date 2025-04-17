@@ -1,10 +1,15 @@
 use bevy::prelude::*;
 
+
+pub mod resolution;
+
 pub struct ConfigurationPlugin;
 
 impl Plugin for ConfigurationPlugin{
     fn build(&self, app: &mut App) {
-        app.add_systems(PreStartup, setup_configuration);
+        app
+        .add_plugins(resolution::ResolutionPlugin)
+        .add_systems(PreStartup, setup_configuration);
     } 
 }
 
