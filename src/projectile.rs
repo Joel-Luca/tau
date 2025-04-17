@@ -3,6 +3,7 @@ use bevy::prelude::*;
 use crate::collision::*;
 use crate::enemy;
 use crate::tank::*;
+use crate::velocity::*;
 
 pub struct ProjectilePlugin; 
 
@@ -42,9 +43,6 @@ fn check_for_collisions(
     }
 }
 
-#[derive(Component)]
-pub struct Velocity{}
-
 fn check_for_collision(
     mut commands: Commands,
     projectile_query: Query<(&mut Velocity, &Transform), With<Projectile>>,
@@ -54,4 +52,3 @@ fn check_for_collision(
 {
 
 }
-

@@ -9,6 +9,7 @@ pub mod player;
 pub mod projectile;
 pub mod resolution;
 pub mod tank;
+pub mod velocity;
 
 fn main() {
     App::new()
