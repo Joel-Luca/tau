@@ -1,8 +1,7 @@
 use bevy::prelude::*;
 
 use crate::collision::*;
-
-use crate::configuration;
+use crate::configuration::*;
 
 pub struct TankPlugin; 
 
@@ -40,7 +39,7 @@ impl TankBundle {
     }
 }
 
-fn check_spawn_protection(mut tank_query : Query<&mut Tank>, time : Res<Time>, configuration : Res<configuration::Configuration>) {
+fn check_spawn_protection(mut tank_query : Query<&mut Tank>, time : Res<Time>, configuration : Res<Configuration>) {
     for mut tank in &mut tank_query {
         if time.delta_secs() > tank.last_time_killed + configuration.spawn_protection && tank.killable == false {
             tank.killable = true;
