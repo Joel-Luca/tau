@@ -9,7 +9,7 @@ pub struct TankPlugin;
 impl Plugin for TankPlugin{
     fn build(&self, app: &mut App) {
         app
-        .add_systems(Update, check_spawn_protection);
+        .add_systems(FixedUpdate, check_spawn_protection);
     }
 }
 
