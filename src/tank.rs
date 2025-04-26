@@ -24,7 +24,9 @@ pub struct Tank{
 
 #[derive(Bundle)]
 pub struct TankBundle{
-    collider: Collider,
+    collider_type: ColliderType,
+    intersects: Intersects,
+    shape: Shape,
     sprite: Sprite,
     tank: Tank, 
     transform: Transform,
@@ -33,7 +35,9 @@ pub struct TankBundle{
 impl TankBundle {
     pub fn new(spawn_location: Transform, sprite: Sprite) -> TankBundle {
         TankBundle {
-            collider: Collider{},
+            collider_type: ColliderType::Aabb,
+            intersects: Intersects::default(),
+            shape: Shape::Rectangle(Rectangle::new(50., 80.)),
             sprite,
             tank: Tank { deaths: 0, killable: false, last_time_killed: 0., spawn_location:spawn_location },
             transform: spawn_location,
