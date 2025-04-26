@@ -1,7 +1,5 @@
 use bevy::{
-    color::palettes::css::*,
-    math::bounding::*,
-    prelude::*,
+    color::palettes::css::*, math::bounding::*, prelude::*
 };
 
 
@@ -24,9 +22,8 @@ impl Plugin for CollisionPlugin{
         .add_systems(
             PostUpdate, 
             (
-                render_shapes.run_if(in_state(ColliderState::Visible)),
+                render_colliders.run_if(in_state(ColliderState::Visible)),
                 intersection_system,
-                render_volumes.run_if(in_state(ColliderState::Visible)),
             ).chain()
         );
     }
@@ -51,13 +48,13 @@ pub enum Shape {
 
 #[derive(Component)]
 pub enum ColliderType {
-    Aabb,
+    Polygon,
     Circle,
 }
 
 #[derive(Component)]
 enum Collider {
-    Aabb(Aabb2d),
+    Polygon(BoundingPolygon),
     Circle(BoundingCircle),
 }
 
@@ -99,7 +96,19 @@ fn update_collider_state(
     state.set(next);
 }
 
-fn render_shapes(mut gizmos: Gizmos, query: Query<(&Shape, &Transform)>) {
+pub trait Bounding2d {
+    fn bounding_polygon(&self, center: Vec2, rotation: f32) -> BoundingPolygon;
+    // fn bounding_circle(&self, isometry: impl Into<Isometry2d>) -> BoundingCircle;
+}
+
+impl Bounding2d for RegularPolygon {
+    fn bounding_polygon(&self, center: Vec2, rotation: f32) -> BoundingPolygon {
+        let vertices: Vec<Vec2> = self.vertices(rotation).into_iter().collect();
+        BoundingPolygon { vertices, center }
+    }
+}
+
+fn render_colliders(mut gizmos: Gizmos, query: Query<(&Shape, &Transform)>) {
     let color = GRAY;
     for (shape, transform) in query.iter() {
         let translation = transform.translation.xy();
@@ -140,16 +149,16 @@ fn update_volumes(
         let rotation = transform.rotation.to_euler(EulerRot::YXZ).2;
         let isometry = Isometry2d::new(translation, Rot2::radians(rotation));
         match collider_type {
-            ColliderType::Aabb => {
+            ColliderType::Polygon => {
                 let mut aabb = match shape {
-                    Shape::Rectangle(r) => r.aabb_2d(isometry),
+                    Shape::Rectangle(r) => BoundingPolygon { center: translation, rotation },
                     Shape::Circle(c) => c.aabb_2d(isometry),
                     Shape::Triangle(t) => t.aabb_2d(isometry),
                     Shape::Line(l) => l.aabb_2d(isometry),
                     Shape::Capsule(c) => c.aabb_2d(isometry),
-                    Shape::Polygon(p) => p.aabb_2d(isometry),
+                    Shape::Polygon(p) => p.bounding_polygon(translation, rotation),
                 };
-                commands.entity(entity).insert(Collider::Aabb(aabb));
+                commands.entity(entity).insert(Collider::Polygon(aabb));
             }
             ColliderType::Circle => {
                 let circle = match shape {
@@ -168,20 +177,6 @@ fn update_volumes(
     }
 }
 
-fn render_volumes(mut gizmos: Gizmos, query: Query<(&Collider, &Intersects)>) {
-    for (volume, intersects) in query.iter() {
-        let color = if **intersects { AQUA } else { ORANGE_RED };
-        match volume {
-            Collider::Aabb(a) => {
-                gizmos.rect_2d(a.center(), a.half_size() * 2., color);
-            }
-            Collider::Circle(c) => {
-                gizmos.circle_2d(c.center(), c.radius(), color);
-            }
-        }
-    }
-}
-
 fn intersection_system(
     mut collider_query: Query<(Entity, &Collider, &mut Intersects)>,
     possible_collisions: Query<(Entity, &Collider)>,
@@ -195,17 +190,15 @@ fn intersection_system(
             }
 
             let hit: bool = match collider {
-                Collider::Aabb(a) => {
+                Collider::Polygon(a) => {
                     match collided_collider {
-                        Collider::Aabb(collided_a) => a.intersects(collided_a),
-                        Collider::Circle(collided_c) => a.intersects(collided_c),
+                        Collider::Polygon(collided_a) => a.intersects(collided_a),
+                        Collider::Circle(collided_c) => false,
                     }
                 }
                 Collider::Circle(c) => {
-                    match collided_collider {
-                        Collider::Aabb(collided_a) => c.intersects(collided_a),
-                        Collider::Circle(collided_c) => c.intersects(collided_c),
-                    }
+                    // TODO
+                    false
                 }
             };
 
@@ -230,3 +223,66 @@ fn update_text(mut text: Single<&mut Text>, cur_state: Res<State<ColliderState>>
     }
     text.push_str("\nPress space to cycle");
 }
+
+pub struct BoundingPolygon{
+    pub vertices: Vec<Vec2>,
+    pub center: Vec2,
+}
+
+pub struct BoundingCircle{
+    pub radius: f32,
+    pub center: Vec2,
+}
+
+impl BoundingPolygon{
+    fn project_vertices(&self, vertices: &Vec<Vec2>, axis: Vec2) -> (f32, f32) {
+        let mut min = f32::MIN;
+        let mut max = f32::MAX;
+        
+        for vertex in vertices {
+            let projecton = vertex.dot(axis);
+
+            if projecton < min {
+                min = projecton;
+            }
+    
+            if projecton > max {
+                max = projecton;
+            }
+        }
+    
+        return (min, max);
+    }
+
+    pub fn intersects(&self, other: &BoundingPolygon) -> bool {
+        for (index, vertex) in self.vertices.iter().enumerate() {
+            let next_vertex = &self.vertices[(index + 1) % self.vertices.len()];
+    
+            let edge = next_vertex - vertex;
+            let axis = Vec2::new(-edge.y, edge.x);
+    
+            let (min_a, max_a) = self.project_vertices(&self.vertices, axis);
+            let (min_b, max_b) = other.project_vertices(&other.vertices, axis);
+    
+            if min_a >= max_b || min_b >= max_a {
+                return false;
+            }
+        }
+        for (index, vertex) in other.vertices.iter().enumerate() {
+            let next_vertex = &other.vertices[(index + 1) % other.vertices.len()];
+    
+            let edge = next_vertex - vertex;
+            let axis = Vec2::new(-edge.y, edge.x);
+    
+            let (min_a, max_a) = self.project_vertices(&self.vertices, axis);
+            let (min_b, max_b) = other.project_vertices(&other.vertices, axis);
+    
+            if min_a >= max_b || min_b >= max_a {
+                return false;
+            }
+        }
+        return true;
+    }
+}
+
+
