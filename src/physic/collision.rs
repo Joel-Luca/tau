@@ -1,5 +1,5 @@
 use bevy::{
-    color::palettes::css::*, math::bounding::*, prelude::*
+    color::palettes::css::*, prelude::*
 };
 
 
@@ -15,7 +15,6 @@ impl Plugin for CollisionPlugin{
             Update, 
             (
                 update_text,
-                update_volumes, 
                 update_collider_state,
             )
         )
@@ -37,23 +36,7 @@ pub enum ColliderState {
 }
 
 #[derive(Component)]
-pub enum Shape {
-    Rectangle(Rectangle),
-    Circle(Circle),
-    Triangle(Triangle2d),
-    Line(Segment2d),
-    Capsule(Capsule2d),
-    Polygon(RegularPolygon),
-}
-
-#[derive(Component)]
-pub enum ColliderType {
-    Polygon,
-    Circle,
-}
-
-#[derive(Component)]
-enum Collider {
+pub enum Collider {
     Polygon(BoundingPolygon),
     Circle(BoundingCircle),
 }
@@ -96,82 +79,21 @@ fn update_collider_state(
     state.set(next);
 }
 
-pub trait Bounding2d {
-    fn bounding_polygon(&self, center: Vec2, rotation: f32) -> BoundingPolygon;
-    // fn bounding_circle(&self, isometry: impl Into<Isometry2d>) -> BoundingCircle;
-}
-
-impl Bounding2d for RegularPolygon {
-    fn bounding_polygon(&self, center: Vec2, rotation: f32) -> BoundingPolygon {
-        let vertices: Vec<Vec2> = self.vertices(rotation).into_iter().collect();
-        BoundingPolygon { vertices, center }
-    }
-}
-
-fn render_colliders(mut gizmos: Gizmos, query: Query<(&Shape, &Transform)>) {
-    let color = GRAY;
-    for (shape, transform) in query.iter() {
+fn render_colliders(mut gizmos: Gizmos, query: Query<(&Collider, &Transform, &Intersects)>) {
+    for (collider, transform, intersects) in query.iter() {
+        let color = if **intersects { AQUA } else { ORANGE_RED };
+        
         let translation = transform.translation.xy();
         let rotation = transform.rotation.to_euler(EulerRot::YXZ).2;
         let isometry = Isometry2d::new(translation, Rot2::radians(rotation));
-        match shape {
-            Shape::Rectangle(r) => {
-                gizmos.primitive_2d(r, isometry, color);
+        match collider {
+            Collider::Polygon(bounding_p) => {
+                let polygon = BoxedPolygon{ vertices: bounding_p.vertices.clone() };
+                gizmos.primitive_2d(&polygon, isometry, color);
             }
-            Shape::Circle(c) => {
-                gizmos.primitive_2d(c, isometry, color);
-            }
-            Shape::Triangle(t) => {
-                gizmos.primitive_2d(t, isometry, color);
-            }
-            Shape::Line(l) => {
-                gizmos.primitive_2d(l, isometry, color);
-            }
-            Shape::Capsule(c) => {
-                gizmos.primitive_2d(c, isometry, color);
-            }
-            Shape::Polygon(p) => {
-                gizmos.primitive_2d(p, isometry, color);
-            }
-        }
-    }
-}
-
-fn update_volumes(
-    mut commands: Commands,
-    query: Query<
-        (Entity, &ColliderType, &Shape, &Transform),
-        Or<(Changed<ColliderType>, Changed<Shape>, Changed<Transform>)>,
-    >,
-) {
-    for (entity, collider_type, shape, transform) in query.iter() {
-        let translation = transform.translation.xy();
-        let rotation = transform.rotation.to_euler(EulerRot::YXZ).2;
-        let isometry = Isometry2d::new(translation, Rot2::radians(rotation));
-        match collider_type {
-            ColliderType::Polygon => {
-                let mut aabb = match shape {
-                    Shape::Rectangle(r) => BoundingPolygon { center: translation, rotation },
-                    Shape::Circle(c) => c.aabb_2d(isometry),
-                    Shape::Triangle(t) => t.aabb_2d(isometry),
-                    Shape::Line(l) => l.aabb_2d(isometry),
-                    Shape::Capsule(c) => c.aabb_2d(isometry),
-                    Shape::Polygon(p) => p.bounding_polygon(translation, rotation),
-                };
-                commands.entity(entity).insert(Collider::Polygon(aabb));
-            }
-            ColliderType::Circle => {
-                let circle = match shape {
-                    Shape::Rectangle(r) => r.bounding_circle(isometry),
-                    Shape::Circle(c) => c.bounding_circle(isometry),
-                    Shape::Triangle(t) => t.bounding_circle(isometry),
-                    Shape::Line(l) => l.bounding_circle(isometry),
-                    Shape::Capsule(c) => c.bounding_circle(isometry),
-                    Shape::Polygon(p) => p.bounding_circle(isometry),
-                };
-                commands
-                    .entity(entity)
-                    .insert(Collider::Circle(circle));
+            Collider::Circle(bounding_c) => {
+                let circle = Circle{ radius: bounding_c.radius };
+                gizmos.primitive_2d(&circle, isometry, color);
             }
         }
     }
@@ -224,37 +146,48 @@ fn update_text(mut text: Single<&mut Text>, cur_state: Res<State<ColliderState>>
     text.push_str("\nPress space to cycle");
 }
 
-pub struct BoundingPolygon{
-    pub vertices: Vec<Vec2>,
-    pub center: Vec2,
+pub trait BoundingVolume{}
+
+pub trait IntersectsVolume<Volume: BoundingVolume + ?Sized> {
+    fn intersects(&self, volume: &Volume) -> bool;
 }
+
+pub struct BoundingPolygon{
+    pub vertices: Box<[Vec2]>,
+}
+
+impl BoundingVolume for BoundingPolygon{}
 
 pub struct BoundingCircle{
     pub radius: f32,
     pub center: Vec2,
 }
 
+impl BoundingVolume for BoundingCircle{}
+
 impl BoundingPolygon{
-    fn project_vertices(&self, vertices: &Vec<Vec2>, axis: Vec2) -> (f32, f32) {
+    fn project_vertices(&self, vertices: &[Vec2], axis: Vec2) -> (f32, f32) {
         let mut min = f32::MIN;
         let mut max = f32::MAX;
         
         for vertex in vertices {
-            let projecton = vertex.dot(axis);
+            let projection = vertex.dot(axis);
 
-            if projecton < min {
-                min = projecton;
+            if projection < min {
+                min = projection;
             }
     
-            if projecton > max {
-                max = projecton;
+            if projection > max {
+                max = projection;
             }
         }
     
         return (min, max);
     }
+}
 
-    pub fn intersects(&self, other: &BoundingPolygon) -> bool {
+impl IntersectsVolume<Self> for BoundingPolygon{
+    fn intersects(&self, other: &BoundingPolygon) -> bool {
         for (index, vertex) in self.vertices.iter().enumerate() {
             let next_vertex = &self.vertices[(index + 1) % self.vertices.len()];
     

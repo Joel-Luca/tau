@@ -24,9 +24,8 @@ pub struct Tank{
 
 #[derive(Bundle)]
 pub struct TankBundle{
-    collider_type: ColliderType,
+    collider: Collider,
     intersects: Intersects,
-    shape: Shape,
     sprite: Sprite,
     tank: Tank, 
     transform: Transform,
@@ -35,9 +34,8 @@ pub struct TankBundle{
 impl TankBundle {
     pub fn new(spawn_location: Transform, sprite: Sprite) -> TankBundle {
         TankBundle {
-            collider_type: ColliderType::Aabb,
+            collider: Collider::Polygon(BoundingPolygon { vertices: Box::new([Vec2::new(0., 0.), Vec2::new(50., 0.), Vec2::new(50., 50.), Vec2::new(0., 50.), Vec2::new(25., 75.)]) }),
             intersects: Intersects::default(),
-            shape: Shape::Rectangle(Rectangle::new(50., 80.)),
             sprite,
             tank: Tank { deaths: 0, killable: false, last_time_killed: 0., spawn_location:spawn_location },
             transform: spawn_location,
