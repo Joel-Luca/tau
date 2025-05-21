@@ -19,8 +19,9 @@ impl Plugin for CollisionPlugin{
             )
         )
         .add_systems(
-            PostUpdate, 
+            PostUpdate,
             (
+                update_colliders,
                 render_colliders.run_if(in_state(ColliderState::Visible)),
                 intersection_system,
             ).chain()
@@ -79,6 +80,17 @@ fn update_collider_state(
     state.set(next);
 }
 
+fn update_colliders(mut query: Query<(&mut Collider, &Transform)>) {
+    for (mut collider, transform) in query.iter_mut() {
+        match *collider {
+            Collider::Polygon(ref mut polygon) => {
+                polygon.update_vertices(transform);
+            }
+            Collider::Circle(ref mut circle) => continue
+        }
+    }   
+}
+ 
 fn render_colliders(mut gizmos: Gizmos, query: Query<(&Collider, &Transform, &Intersects)>) {
     for (collider, transform, intersects) in query.iter() {
         let color = if **intersects { AQUA } else { ORANGE_RED };
@@ -153,6 +165,7 @@ pub trait IntersectsVolume<Volume: BoundingVolume + ?Sized> {
 }
 
 pub struct BoundingPolygon{
+    pub relative_vertices: Box<[Vec2]>,
     pub vertices: Box<[Vec2]>,
 }
 
@@ -166,9 +179,20 @@ pub struct BoundingCircle{
 impl BoundingVolume for BoundingCircle{}
 
 impl BoundingPolygon{
-    fn project_vertices(&self, vertices: &[Vec2], axis: Vec2) -> (f32, f32) {
-        let mut min = f32::MIN;
-        let mut max = f32::MAX;
+    pub fn new(vertices: Box<[Vec2]>) -> BoundingPolygon {
+        let absolute_vertices = vertices.clone();
+        BoundingPolygon { relative_vertices: vertices, vertices: absolute_vertices }
+    }
+
+    pub fn update_vertices(&mut self, transform: &Transform) {
+        for (index, vertex) in self.relative_vertices.iter().enumerate() {
+            self.vertices[index] = Vec2::new(vertex.x + transform.translation.x, vertex.y + transform.translation.y);
+        }
+    }
+
+    fn project_vertices(&self, vertices: &Box<[Vec2]>, axis: Vec2) -> (f32, f32) {
+        let mut min = f32::MAX;
+        let mut max = f32::MIN;
         
         for vertex in vertices {
             let projection = vertex.dot(axis);
@@ -196,7 +220,7 @@ impl IntersectsVolume<Self> for BoundingPolygon{
     
             let (min_a, max_a) = self.project_vertices(&self.vertices, axis);
             let (min_b, max_b) = other.project_vertices(&other.vertices, axis);
-    
+
             if min_a >= max_b || min_b >= max_a {
                 return false;
             }
@@ -206,10 +230,10 @@ impl IntersectsVolume<Self> for BoundingPolygon{
     
             let edge = next_vertex - vertex;
             let axis = Vec2::new(-edge.y, edge.x);
-    
+            
             let (min_a, max_a) = self.project_vertices(&self.vertices, axis);
             let (min_b, max_b) = other.project_vertices(&other.vertices, axis);
-    
+
             if min_a >= max_b || min_b >= max_a {
                 return false;
             }
