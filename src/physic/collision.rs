@@ -1,31 +1,30 @@
 use bevy::{
-    color::palettes::css::*, prelude::*
+    color::palettes::css::*, prelude::*,
 };
 
+pub struct CollisionPlugin;
 
-pub struct CollisionPlugin; 
-
-impl Plugin for CollisionPlugin{
+impl Plugin for CollisionPlugin {
     fn build(&self, app: &mut App) {
         app
-        .init_state::<ColliderState>()
-        .add_event::<CollisionEvent>()
-        .add_systems(Startup, setup)
-        .add_systems(
-            Update, 
-            (
-                update_text,
-                update_collider_state,
+            .init_state::<ColliderState>()
+            .add_event::<CollisionEvent>()
+            .add_systems(Startup, setup)
+            .add_systems(
+                Update,
+                (
+                    update_text,
+                    update_collider_state,
+                ),
             )
-        )
-        .add_systems(
-            PostUpdate,
-            (
-                update_colliders,
-                render_colliders.run_if(in_state(ColliderState::Visible)),
-                intersection_system,
-            ).chain()
-        );
+            .add_systems(
+                PostUpdate,
+                (
+                    update_colliders,
+                    render_colliders.run_if(in_state(ColliderState::Visible)),
+                    intersection_system,
+                ).chain(),
+            );
     }
 }
 
@@ -33,7 +32,7 @@ impl Plugin for CollisionPlugin{
 pub enum ColliderState {
     #[default]
     Hidden,
-    Visible,  
+    Visible,
 }
 
 #[derive(Component)]
@@ -88,23 +87,23 @@ fn update_colliders(mut query: Query<(&mut Collider, &Transform)>) {
             }
             Collider::Circle(ref mut circle) => continue
         }
-    }   
+    }
 }
- 
+
 fn render_colliders(mut gizmos: Gizmos, query: Query<(&Collider, &Transform, &Intersects)>) {
     for (collider, transform, intersects) in query.iter() {
         let color = if **intersects { AQUA } else { ORANGE_RED };
-        
+
         let translation = transform.translation.xy();
         let rotation = transform.rotation.to_euler(EulerRot::YXZ).2;
         let isometry = Isometry2d::new(translation, Rot2::radians(rotation));
         match collider {
             Collider::Polygon(bounding_p) => {
-                let polygon = BoxedPolygon{ vertices: bounding_p.vertices.clone() };
+                let polygon: BoxedPolygon = BoxedPolygon { vertices: bounding_p.relative_vertices.clone() };
                 gizmos.primitive_2d(&polygon, isometry, color);
             }
             Collider::Circle(bounding_c) => {
-                let circle = Circle{ radius: bounding_c.radius };
+                let circle = Circle { radius: bounding_c.radius };
                 gizmos.primitive_2d(&circle, isometry, color);
             }
         }
@@ -115,17 +114,17 @@ fn intersection_system(
     mut collider_query: Query<(Entity, &Collider, &mut Intersects)>,
     possible_collisions: Query<(Entity, &Collider)>,
     mut events: EventWriter<CollisionEvent>,
-) 
+)
 {
     for (entity, collider, mut intersects) in collider_query.iter_mut() {
-        for (collided_entity, collided_collider) in possible_collisions.iter() {
-            if entity.index() == collided_entity.index() {
+        for (other_entity, other_collider) in possible_collisions.iter() {
+            if entity.index() == other_entity.index() {
                 continue;
             }
 
             let hit: bool = match collider {
                 Collider::Polygon(a) => {
-                    match collided_collider {
+                    match other_collider {
                         Collider::Polygon(collided_a) => a.intersects(collided_a),
                         Collider::Circle(collided_c) => false,
                     }
@@ -137,7 +136,7 @@ fn intersection_system(
             };
 
             **intersects = hit;
-            events.send(CollisionEvent { entity, collided_entity });
+            events.send(CollisionEvent { entity, collided_entity: other_entity });
         }
     }
 }
@@ -158,27 +157,29 @@ fn update_text(mut text: Single<&mut Text>, cur_state: Res<State<ColliderState>>
     text.push_str("\nPress space to cycle");
 }
 
-pub trait BoundingVolume{}
+
+pub trait BoundingVolume {}
 
 pub trait IntersectsVolume<Volume: BoundingVolume + ?Sized> {
     fn intersects(&self, volume: &Volume) -> bool;
 }
 
-pub struct BoundingPolygon{
+
+pub struct BoundingPolygon {
     pub relative_vertices: Box<[Vec2]>,
     pub vertices: Box<[Vec2]>,
 }
 
-impl BoundingVolume for BoundingPolygon{}
+impl BoundingVolume for BoundingPolygon {}
 
-pub struct BoundingCircle{
+pub struct BoundingCircle {
     pub radius: f32,
     pub center: Vec2,
 }
 
-impl BoundingVolume for BoundingCircle{}
+impl BoundingVolume for BoundingCircle {}
 
-impl BoundingPolygon{
+impl BoundingPolygon {
     pub fn new(vertices: Box<[Vec2]>) -> BoundingPolygon {
         let absolute_vertices = vertices.clone();
         BoundingPolygon { relative_vertices: vertices, vertices: absolute_vertices }
@@ -186,38 +187,39 @@ impl BoundingPolygon{
 
     pub fn update_vertices(&mut self, transform: &Transform) {
         for (index, vertex) in self.relative_vertices.iter().enumerate() {
-            self.vertices[index] = Vec2::new(vertex.x + transform.translation.x, vertex.y + transform.translation.y);
+            self.vertices[index].x = transform.translation.x + vertex.x;
+            self.vertices[index].y = transform.translation.y + vertex.y;
         }
     }
 
     fn project_vertices(&self, vertices: &Box<[Vec2]>, axis: Vec2) -> (f32, f32) {
         let mut min = f32::MAX;
         let mut max = f32::MIN;
-        
+
         for vertex in vertices {
             let projection = vertex.dot(axis);
 
             if projection < min {
                 min = projection;
             }
-    
+
             if projection > max {
                 max = projection;
             }
         }
-    
+
         return (min, max);
     }
 }
 
-impl IntersectsVolume<Self> for BoundingPolygon{
+impl IntersectsVolume<Self> for BoundingPolygon {
     fn intersects(&self, other: &BoundingPolygon) -> bool {
         for (index, vertex) in self.vertices.iter().enumerate() {
             let next_vertex = &self.vertices[(index + 1) % self.vertices.len()];
-    
+
             let edge = next_vertex - vertex;
             let axis = Vec2::new(-edge.y, edge.x);
-    
+
             let (min_a, max_a) = self.project_vertices(&self.vertices, axis);
             let (min_b, max_b) = other.project_vertices(&other.vertices, axis);
 
@@ -227,10 +229,10 @@ impl IntersectsVolume<Self> for BoundingPolygon{
         }
         for (index, vertex) in other.vertices.iter().enumerate() {
             let next_vertex = &other.vertices[(index + 1) % other.vertices.len()];
-    
+
             let edge = next_vertex - vertex;
             let axis = Vec2::new(-edge.y, edge.x);
-            
+
             let (min_a, max_a) = self.project_vertices(&self.vertices, axis);
             let (min_b, max_b) = other.project_vertices(&other.vertices, axis);
 
