@@ -47,7 +47,7 @@ pub struct Intersects(bool);
 #[derive(Event)]
 pub struct CollisionEvent {
     entity: Entity,
-    collided_entity: Entity, 
+    collided_entity: Entity,
 }
 
 fn setup(mut commands: Commands) {
@@ -122,9 +122,9 @@ fn intersection_system(
                 continue;
             }
 
-            let hit: bool = match collider {
+            let hit: bool = match &*collider {
                 Collider::Polygon(a) => {
-                    match other_collider {
+                    match &*other_collider {
                         Collider::Polygon(collided_a) => a.intersects(collided_a),
                         Collider::Circle(collided_c) => false,
                     }

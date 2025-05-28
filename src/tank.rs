@@ -1,34 +1,32 @@
 use bevy::prelude::*;
 
-
 use crate::configuration::*;
 use crate::physic::collision::*;
 
+pub struct TankPlugin;
 
-pub struct TankPlugin; 
-
-impl Plugin for TankPlugin{
+impl Plugin for TankPlugin {
     fn build(&self, app: &mut App) {
         app
-        .add_systems(FixedUpdate, check_spawn_protection);
+            .add_systems(FixedUpdate, check_spawn_protection);
     }
 }
 
 #[derive(Component)]
-pub struct Tank{
-    pub deaths : i32,
-    pub killable : bool,
-    pub last_time_killed : f32,
+pub struct Tank {
+    pub deaths: i32,
+    pub killable: bool,
+    pub last_time_killed: f32,
     pub shoot_location: Vec2,
-    pub spawn_location : Transform, 
+    pub spawn_location: Transform,
 }
 
 #[derive(Bundle)]
-pub struct TankBundle{
+pub struct TankBundle {
     collider: Collider,
     intersects: Intersects,
     sprite: Sprite,
-    tank: Tank, 
+    tank: Tank,
     transform: Transform,
 }
 
@@ -46,7 +44,7 @@ impl TankBundle {
     }
 }
 
-fn check_spawn_protection(mut tank_query : Query<&mut Tank>, time : Res<Time>, configuration : Res<Configuration>) {
+fn check_spawn_protection(mut tank_query: Query<&mut Tank>, time: Res<Time>, configuration: Res<Configuration>) {
     for mut tank in &mut tank_query {
         if time.delta_secs() > tank.last_time_killed + configuration.spawn_protection && tank.killable == false {
             tank.killable = true;
