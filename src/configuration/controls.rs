@@ -22,6 +22,18 @@ pub struct Movement {
     pub shoot: KeyCode,
 }
 
+impl Clone for Movement {
+    fn clone(&self) -> Self {
+        Self {
+            forward: self.forward.clone(),
+            backward: self.backward.clone(),
+            right: self.right.clone(),
+            left: self.left.clone(),
+            shoot: self.shoot.clone(),
+        }
+    }
+}
+
 impl Controls {
     pub fn new() -> Controls {
         Controls {
