@@ -19,6 +19,7 @@ pub struct Tank{
     pub deaths : i32,
     pub killable : bool,
     pub last_time_killed : f32,
+    pub shoot_location: Vec2,
     pub spawn_location : Transform, 
 }
 
@@ -33,12 +34,13 @@ pub struct TankBundle{
 
 impl TankBundle {
     pub fn new(spawn_location: Transform, sprite: Sprite) -> TankBundle {
+        const SHOOT_LOCATION: Vec2 = Vec2::new(0., 50.);
         let collider = BoundingPolygon::new(Box::new([Vec2::new(-25., -25.), Vec2::new(-25., 25.), Vec2::new(0., 50.), Vec2::new(25., 25.), Vec2::new(25., -25.)]));
         TankBundle {
             collider: Collider::Polygon(collider),
             intersects: Intersects::default(),
             sprite,
-            tank: Tank { deaths: 0, killable: false, last_time_killed: 0., spawn_location:spawn_location },
+            tank: Tank { deaths: 0, killable: false, last_time_killed: 0., shoot_location: SHOOT_LOCATION, spawn_location },
             transform: spawn_location,
         }
     }
