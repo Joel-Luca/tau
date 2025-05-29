@@ -24,6 +24,7 @@ pub struct Enemy{
 
 
 fn setup_enemies(mut commands : Commands, assets_server : Res<AssetServer>, resolution : Res<Resolution>) {
+    /*
     let enemy_texture = assets_server.load("player/tank_pink.png");
     let spawn_location = Transform::from_translation(Vec3::new(0., 0., 0.)).with_scale(Vec3::splat(resolution.pixel_ratio));
     commands.spawn(
@@ -34,6 +35,7 @@ fn setup_enemies(mut commands : Commands, assets_server : Res<AssetServer>, reso
             TankBundle::new(spawn_location, Sprite::from_image(enemy_texture)),
         )
     );
+    */
 }
 
 fn update_enemies(

@@ -22,12 +22,20 @@ pub struct Player{
 
 
 fn setup_player(mut commands : Commands, assets_server : Res<AssetServer>, resolution : Res<Resolution>, controls : Res<Controls>) {
-    let player_texture = assets_server.load("player/tank_yellow.png");
+    let player_1_texture = assets_server.load("player/tank_yellow.png");
+    let player_2_texture = assets_server.load("player/tank_pink.png");
     let spawn_location = Transform::from_translation(Vec3::new(0., 0., 0.)).with_scale(Vec3::splat(resolution.pixel_ratio));
     commands.spawn(
         (
             Player{ controls: controls.movement.clone() },
-            TankBundle::new(spawn_location, Sprite::from_image(player_texture)),
+            TankBundle::new(spawn_location, Sprite::from_image(player_1_texture)),
+        )
+    );
+
+    commands.spawn(
+        (
+            Player{ controls: controls.second_movement.clone() },
+            TankBundle::new(spawn_location, Sprite::from_image(player_2_texture)),
         )
     );
 }
@@ -43,19 +51,19 @@ fn move_player(
         let mut movement = 0.;
         let mut rotation = 0.;
 
-        if keys.pressed(player.controls.forward) {
+        if keys.pressed(player.controls.left) {
             rotation += 1.;
         }
 
-        if keys.pressed(player.controls.backward) {
+        if keys.pressed(player.controls.right) {
             rotation -= 1.;
         }
 
-        if keys.pressed(player.controls.right) {
+        if keys.pressed(player.controls.forward) {
             movement += 1.;
         }
 
-        if keys.pressed(player.controls.left) {
+        if keys.pressed(player.controls.backward) {
             movement -= 1.;
         }
 
