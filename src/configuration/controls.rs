@@ -1,3 +1,4 @@
+use bevy::input::keyboard::Key;
 use bevy::prelude::*;
 
 pub struct ControlsPlugin;
@@ -10,6 +11,7 @@ impl Plugin for ControlsPlugin {
 
 #[derive(Resource)]
 pub struct Controls {
+    pub debug_collider_state: KeyCode,
     pub movement: Movement,
     pub second_movement: Movement,
 }
@@ -37,6 +39,7 @@ impl Clone for Movement {
 impl Controls {
     pub fn new() -> Controls {
         Controls {
+            debug_collider_state: KeyCode::F1,
             movement: Movement {
                 forward: KeyCode::KeyW,
                 backward: KeyCode::KeyS,

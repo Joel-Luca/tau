@@ -1,52 +1,63 @@
 use bevy::prelude::*;
+use std::time::SystemTime;
 
-use crate::configuration::*;
 use crate::configuration::controls::*;
 use crate::configuration::resolution::*;
+use crate::configuration::*;
+use crate::projectile::bullet::BulletBundle;
 use crate::tank::*;
 
-pub struct PlayerPlugin; 
+pub struct PlayerPlugin;
 
-impl Plugin for PlayerPlugin{
+impl Plugin for PlayerPlugin {
     fn build(&self, app: &mut App) {
-        app
-        .add_systems(Startup, setup_player)
-        .add_systems(Update, move_player);
+        app.add_systems(Startup, setup_player)
+            .add_systems(Update, (move_player, shoot).chain());
     }
 }
- 
+
 #[derive(Component)]
-pub struct Player{
+pub struct Player {
     controls: Movement,
+    last_shot: SystemTime,
 }
 
+impl Player {
+    pub fn new(controls: Movement) -> Player {
+        Player {
+            controls,
+            last_shot: SystemTime::now(),
+        }
+    }
+}
 
-fn setup_player(mut commands : Commands, assets_server : Res<AssetServer>, resolution : Res<Resolution>, controls : Res<Controls>) {
+fn setup_player(
+    mut commands: Commands,
+    assets_server: Res<AssetServer>,
+    resolution: Res<Resolution>,
+    controls: Res<Controls>,
+) {
     let player_1_texture = assets_server.load("player/tank_yellow.png");
     let player_2_texture = assets_server.load("player/tank_pink.png");
-    let spawn_location = Transform::from_translation(Vec3::new(0., 0., 0.)).with_scale(Vec3::splat(resolution.pixel_ratio));
-    commands.spawn(
-        (
-            Player{ controls: controls.movement.clone() },
-            TankBundle::new(spawn_location, Sprite::from_image(player_1_texture)),
-        )
-    );
+    let spawn_location = Transform::from_translation(Vec3::new(0., 0., 0.))
+        .with_scale(Vec3::splat(resolution.tank_pixel_ratio));
+    commands.spawn((
+        Player::new(controls.movement.clone()),
+        TankBundle::new(spawn_location, Sprite::from_image(player_1_texture)),
+    ));
 
-    commands.spawn(
-        (
-            Player{ controls: controls.second_movement.clone() },
-            TankBundle::new(spawn_location, Sprite::from_image(player_2_texture)),
-        )
-    );
+    commands.spawn((
+        Player::new(controls.second_movement.clone()),
+        TankBundle::new(spawn_location, Sprite::from_image(player_2_texture)),
+    ));
 }
 
 fn move_player(
-    mut query : Query<(&mut Transform, &Player)>,
-    time : Res<Time>,
-    keys : Res<ButtonInput<KeyCode>>,
-    configuration : Res<Configuration>
-)
-{
+    mut query: Query<(&mut Transform, &Player)>,
+    time: Res<Time>,
+    keys: Res<ButtonInput<KeyCode>>,
+    configuration: Res<Configuration>,
+) {
     for (mut transform, player) in query.iter_mut() {
         let mut movement = 0.;
         let mut rotation = 0.;
@@ -73,5 +84,35 @@ fn move_player(
         let distance = movement * configuration.move_speed * time.delta_secs();
 
         transform.translation += direction * distance;
+    }
+}
+
+fn shoot(
+    mut query: Query<(&mut Player, &Tank, &Transform)>,
+    mut commands: Commands,
+    assets_server: Res<AssetServer>,
+    configuration: Res<Configuration>,
+    resolution: Res<Resolution>,
+    keys: Res<ButtonInput<KeyCode>>,
+) {
+    for (mut player, tank, transform) in query.iter_mut() {
+        let duration = SystemTime::now().duration_since(player.last_shot).unwrap();
+        if keys.pressed(player.controls.shoot)
+            && duration.as_millis() > configuration.shoot_interval
+        {
+            player.last_shot = SystemTime::now();
+
+            let direction = transform.rotation * Vec3::Y;
+
+            let position = transform.translation + direction * tank.shoot_location;
+            let spawn_location = Transform::from_translation(position)
+                .with_scale(Vec3::splat(resolution.projectile_pixel_ratio));
+            commands.spawn(BulletBundle::new(
+                spawn_location,
+                direction,
+                &assets_server,
+                &configuration,
+            ));
+        }
     }
 }

@@ -1,10 +1,6 @@
 use bevy::prelude::*;
 
-
 pub mod bullet;
 
-
 #[derive(Component)]
-pub struct Projectile {
-    pub speed : f32,
-}
+pub struct Projectile {}

@@ -1,29 +1,22 @@
-use bevy::{
-    color::palettes::css::*, prelude::*,
-};
+use crate::configuration::controls::Controls;
+use bevy::{color::palettes::css::*, prelude::*};
 
 pub struct CollisionPlugin;
 
 impl Plugin for CollisionPlugin {
     fn build(&self, app: &mut App) {
-        app
-            .init_state::<ColliderState>()
+        app.init_state::<ColliderState>()
             .add_event::<CollisionEvent>()
             .add_systems(Startup, setup)
-            .add_systems(
-                Update,
-                (
-                    update_text,
-                    update_collider_state,
-                ),
-            )
+            .add_systems(Update, (update_text, update_collider_state))
             .add_systems(
                 PostUpdate,
                 (
                     update_colliders,
                     render_colliders.run_if(in_state(ColliderState::Visible)),
                     intersection_system,
-                ).chain(),
+                )
+                    .chain(),
             );
     }
 }
@@ -63,11 +56,12 @@ fn setup(mut commands: Commands) {
 }
 
 fn update_collider_state(
+    controls: Res<Controls>,
     keycode: Res<ButtonInput<KeyCode>>,
     cur_state: Res<State<ColliderState>>,
     mut state: ResMut<NextState<ColliderState>>,
 ) {
-    if !keycode.just_pressed(KeyCode::Space) {
+    if !keycode.just_pressed(controls.debug_collider_state) {
         return;
     }
 
@@ -85,7 +79,7 @@ fn update_colliders(mut query: Query<(&mut Collider, &Transform)>) {
             Collider::Polygon(ref mut polygon) => {
                 polygon.update_vertices(transform);
             }
-            Collider::Circle(ref mut circle) => continue
+            Collider::Circle(ref mut circle) => continue,
         }
     }
 }
@@ -99,11 +93,15 @@ fn render_colliders(mut gizmos: Gizmos, query: Query<(&Collider, &Transform, &In
         let isometry = Isometry2d::new(translation, Rot2::radians(rotation));
         match collider {
             Collider::Polygon(bounding_p) => {
-                let polygon: BoxedPolygon = BoxedPolygon { vertices: bounding_p.relative_vertices.clone() };
+                let polygon: BoxedPolygon = BoxedPolygon {
+                    vertices: bounding_p.relative_vertices.clone(),
+                };
                 gizmos.primitive_2d(&polygon, isometry, color);
             }
             Collider::Circle(bounding_c) => {
-                let circle = Circle { radius: bounding_c.radius };
+                let circle = Circle {
+                    radius: bounding_c.radius,
+                };
                 gizmos.primitive_2d(&circle, isometry, color);
             }
         }
@@ -114,8 +112,7 @@ fn intersection_system(
     mut collider_query: Query<(Entity, &Collider, &mut Intersects)>,
     possible_collisions: Query<(Entity, &Collider)>,
     mut events: EventWriter<CollisionEvent>,
-)
-{
+) {
     for (entity, collider, mut intersects) in collider_query.iter_mut() {
         for (other_entity, other_collider) in possible_collisions.iter() {
             if entity.index() == other_entity.index() {
@@ -123,12 +120,10 @@ fn intersection_system(
             }
 
             let hit: bool = match &*collider {
-                Collider::Polygon(a) => {
-                    match &*other_collider {
-                        Collider::Polygon(collided_a) => a.intersects(collided_a),
-                        Collider::Circle(collided_c) => false,
-                    }
-                }
+                Collider::Polygon(a) => match &*other_collider {
+                    Collider::Polygon(collided_a) => a.intersects(collided_a),
+                    Collider::Circle(collided_c) => false,
+                },
                 Collider::Circle(c) => {
                     // TODO
                     false
@@ -136,7 +131,10 @@ fn intersection_system(
             };
 
             **intersects = hit;
-            events.send(CollisionEvent { entity, collided_entity: other_entity });
+            events.send(CollisionEvent {
+                entity,
+                collided_entity: other_entity,
+            });
         }
     }
 }
@@ -157,13 +155,11 @@ fn update_text(mut text: Single<&mut Text>, cur_state: Res<State<ColliderState>>
     text.push_str("\nPress space to cycle");
 }
 
-
 pub trait BoundingVolume {}
 
 pub trait IntersectsVolume<Volume: BoundingVolume + ?Sized> {
     fn intersects(&self, volume: &Volume) -> bool;
 }
-
 
 pub struct BoundingPolygon {
     pub relative_vertices: Box<[Vec2]>,
@@ -182,7 +178,10 @@ impl BoundingVolume for BoundingCircle {}
 impl BoundingPolygon {
     pub fn new(vertices: Box<[Vec2]>) -> BoundingPolygon {
         let absolute_vertices = vertices.clone();
-        BoundingPolygon { relative_vertices: vertices, vertices: absolute_vertices }
+        BoundingPolygon {
+            relative_vertices: vertices,
+            vertices: absolute_vertices,
+        }
     }
 
     pub fn update_vertices(&mut self, transform: &Transform) {
@@ -243,5 +242,3 @@ impl IntersectsVolume<Self> for BoundingPolygon {
         return true;
     }
 }
-
-
