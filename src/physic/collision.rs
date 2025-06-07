@@ -14,9 +14,8 @@ impl Plugin for CollisionPlugin {
                 (
                     update_colliders,
                     render_colliders.run_if(in_state(ColliderState::Visible)),
-                    intersection_system,
-                )
-                    .chain(),
+                    intersection_system.run_if(in_state(ColliderState::Visible)),
+                ).chain(),
             );
     }
 }
@@ -34,13 +33,28 @@ pub enum Collider {
     Circle(BoundingCircle),
 }
 
+impl Collider {
+    fn intersects(&self, other: &Collider) -> bool {
+        match &*self {
+            Collider::Polygon(a) => match &*other {
+                Collider::Polygon(collided_a) => a.intersects_volume(collided_a),
+                Collider::Circle(collided_c) => a.intersects_volume(collided_c),
+            },
+            Collider::Circle(c) => match &*other {
+                Collider::Polygon(collided_a) => c.intersects_volume(collided_a),
+                Collider::Circle(collided_c) => c.intersects_volume(collided_c),
+            }
+        }
+    }
+}
+
 #[derive(Component, Deref, DerefMut, Default)]
 pub struct Intersects(bool);
 
 #[derive(Event)]
 pub struct CollisionEvent {
-    entity: Entity,
-    collided_entity: Entity,
+    pub entity: Entity,
+    pub collided_entity: Entity,
 }
 
 fn setup(mut commands: Commands) {
@@ -79,7 +93,9 @@ fn update_colliders(mut query: Query<(&mut Collider, &Transform)>) {
             Collider::Polygon(ref mut polygon) => {
                 polygon.update_vertices(transform);
             }
-            Collider::Circle(ref mut circle) => continue,
+            Collider::Circle(ref mut circle) => {
+                circle.update_center(transform);
+            }
         }
     }
 }
@@ -114,32 +130,26 @@ fn intersection_system(
     mut events: EventWriter<CollisionEvent>,
 ) {
     for (entity, collider, mut intersects) in collider_query.iter_mut() {
+        let mut collied: bool = false;
         for (other_entity, other_collider) in possible_collisions.iter() {
             if entity.index() == other_entity.index() {
                 continue;
             }
 
-            let hit: bool = match &*collider {
-                Collider::Polygon(a) => match &*other_collider {
-                    Collider::Polygon(collided_a) => a.intersects(collided_a),
-                    Collider::Circle(collided_c) => false,
-                },
-                Collider::Circle(c) => {
-                    // TODO
-                    false
-                }
-            };
+            if collider.intersects(other_collider) {
+                collied = true;
 
-            **intersects = hit;
-            events.send(CollisionEvent {
-                entity,
-                collided_entity: other_entity,
-            });
+                events.send(CollisionEvent {
+                    entity,
+                    collided_entity: other_entity,
+                });
+            }
         }
+        **intersects = collied;
     }
 }
 
-fn update_text(mut text: Single<&mut Text>, cur_state: Res<State<ColliderState>>) {
+fn update_text(mut text: Single<&mut Text>, cur_state: Res<State<ColliderState>>, controls: Res<Controls>) {
     if !cur_state.is_changed() {
         return;
     }
@@ -152,14 +162,10 @@ fn update_text(mut text: Single<&mut Text>, cur_state: Res<State<ColliderState>>
         let s = if **cur_state == state { "*" } else { " " };
         text.push_str(&format!(" {s} {state:?} {s}\n"));
     }
-    text.push_str("\nPress space to cycle");
+    text.push_str("\nPress F1 to cycle");
 }
 
 pub trait BoundingVolume {}
-
-pub trait IntersectsVolume<Volume: BoundingVolume + ?Sized> {
-    fn intersects(&self, volume: &Volume) -> bool;
-}
 
 pub struct BoundingPolygon {
     pub relative_vertices: Box<[Vec2]>,
@@ -207,38 +213,134 @@ impl BoundingPolygon {
             }
         }
 
-        return (min, max);
+        (min, max)
     }
-}
 
-impl IntersectsVolume<Self> for BoundingPolygon {
-    fn intersects(&self, other: &BoundingPolygon) -> bool {
+    pub fn get_closest_vertex(&self, point: Vec2) -> Vec2 {
+        let mut closest: Vec2 = Default::default();
+        let mut min: f32 = f32::MAX;
+
+        for vertex in self.vertices.iter() {
+            let distance = vertex.distance(point);
+
+            if distance < min {
+                min = distance;
+                closest = vertex.clone();
+            }
+        }
+
+        closest
+    }
+
+    pub fn intersects_circle(&self, circle: &BoundingCircle) -> bool {
         for (index, vertex) in self.vertices.iter().enumerate() {
             let next_vertex = &self.vertices[(index + 1) % self.vertices.len()];
 
             let edge = next_vertex - vertex;
-            let axis = Vec2::new(-edge.y, edge.x);
+            let axis = Vec2::new(-edge.y, edge.x).normalize();
 
             let (min_a, max_a) = self.project_vertices(&self.vertices, axis);
-            let (min_b, max_b) = other.project_vertices(&other.vertices, axis);
+            let (min_b, max_b) = circle.project_circle(axis);
 
             if min_a >= max_b || min_b >= max_a {
                 return false;
             }
         }
-        for (index, vertex) in other.vertices.iter().enumerate() {
-            let next_vertex = &other.vertices[(index + 1) % other.vertices.len()];
+
+        let closest = self.get_closest_vertex(circle.center);
+        let axis = (closest - circle.center).normalize();
+
+        let (min_a, max_a) = self.project_vertices(&self.vertices, axis);
+        let (min_b, max_b) = circle.project_circle(axis);
+
+        if min_a >= max_b || min_b >= max_a {
+            return false;
+        }
+
+        true
+    }
+}
+
+impl BoundingCircle {
+    pub fn update_center(&mut self, transform: &Transform) {
+        self.center = transform.translation.xy();
+    }
+
+    fn project_circle(&self, axis: Vec2) -> (f32, f32) {
+        let direction = axis.normalize();
+        let vector = self.radius * direction;
+        let p1 = self.center + vector;
+        let p2 = self.center - vector;
+
+        let mut min = p1.dot(axis);
+        let mut max = p2.dot(axis);
+
+        if min > max {
+            let temp = min;
+            min = max;
+            max = temp;
+        }
+
+        (min, max)
+    }
+}
+
+pub trait IntersectsVolume<Volume: BoundingVolume + ?Sized> {
+    fn intersects_volume(&self, volume: &Volume) -> bool;
+}
+
+impl IntersectsVolume<Self> for BoundingPolygon {
+    fn intersects_volume(&self, other_polygon: &BoundingPolygon) -> bool {
+        for (index, vertex) in self.vertices.iter().enumerate() {
+            let next_vertex = &self.vertices[(index + 1) % self.vertices.len()];
 
             let edge = next_vertex - vertex;
-            let axis = Vec2::new(-edge.y, edge.x);
+            let axis = Vec2::new(-edge.y, edge.x).normalize();
 
             let (min_a, max_a) = self.project_vertices(&self.vertices, axis);
-            let (min_b, max_b) = other.project_vertices(&other.vertices, axis);
+            let (min_b, max_b) = other_polygon.project_vertices(&other_polygon.vertices, axis);
 
             if min_a >= max_b || min_b >= max_a {
                 return false;
             }
         }
-        return true;
+        for (index, vertex) in other_polygon.vertices.iter().enumerate() {
+            let next_vertex = &other_polygon.vertices[(index + 1) % other_polygon.vertices.len()];
+
+            let edge = next_vertex - vertex;
+            let axis = Vec2::new(-edge.y, edge.x).normalize();
+
+            let (min_a, max_a) = self.project_vertices(&self.vertices, axis);
+            let (min_b, max_b) = other_polygon.project_vertices(&other_polygon.vertices, axis);
+
+            if min_a >= max_b || min_b >= max_a {
+                return false;
+            }
+        }
+        true
+    }
+}
+
+impl IntersectsVolume<BoundingCircle> for BoundingPolygon {
+    fn intersects_volume(&self, circle: &BoundingCircle) -> bool {
+        self.intersects_circle(circle)
+    }
+}
+
+impl IntersectsVolume<Self> for BoundingCircle {
+    fn intersects_volume(&self, circle: &BoundingCircle) -> bool {
+        let distance: f32 = self.center.distance(circle.center);
+        let radii: f32 = self.radius + circle.radius;
+
+        if distance >= radii {
+            return false;
+        }
+        true
+    }
+}
+
+impl IntersectsVolume<BoundingPolygon> for BoundingCircle {
+    fn intersects_volume(&self, polygon: &BoundingPolygon) -> bool {
+        polygon.intersects_circle(self)
     }
 }

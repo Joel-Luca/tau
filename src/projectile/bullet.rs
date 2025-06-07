@@ -2,7 +2,6 @@ use crate::configuration::Configuration;
 use crate::physic::collision::*;
 use crate::physic::velocity::*;
 use crate::projectile::*;
-use bevy::prelude::*;
 
 #[derive(Component)]
 pub struct Bullet {}
@@ -27,8 +26,8 @@ impl BulletBundle {
     ) -> BulletBundle {
         let bullet_texture = assets_server.load("ammunition/bullet.png");
         let collider = BoundingCircle {
-            radius: 0.0,
-            center: Default::default(),
+            radius: 5.,
+            center: position.translation.xy(),
         };
         let velocity = configuration.bullet_speed * direction;
         BulletBundle {
