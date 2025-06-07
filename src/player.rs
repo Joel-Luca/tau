@@ -1,10 +1,11 @@
-use bevy::prelude::*;
 use std::time::SystemTime;
+
+use bevy::prelude::*;
 
 use crate::configuration::controls::*;
 use crate::configuration::resolution::*;
 use crate::configuration::*;
-use crate::projectile::bullet::BulletBundle;
+use crate::projectile::bullet::*;
 use crate::tank::*;
 
 pub struct PlayerPlugin;

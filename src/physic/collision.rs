@@ -15,7 +15,8 @@ impl Plugin for CollisionPlugin {
                     update_colliders,
                     render_colliders.run_if(in_state(ColliderState::Visible)),
                     intersection_system.run_if(in_state(ColliderState::Visible)),
-                ).chain(),
+                )
+                    .chain(),
             );
     }
 }
@@ -43,7 +44,7 @@ impl Collider {
             Collider::Circle(c) => match &*other {
                 Collider::Polygon(collided_a) => c.intersects_volume(collided_a),
                 Collider::Circle(collided_c) => c.intersects_volume(collided_c),
-            }
+            },
         }
     }
 }
@@ -149,7 +150,11 @@ fn intersection_system(
     }
 }
 
-fn update_text(mut text: Single<&mut Text>, cur_state: Res<State<ColliderState>>, controls: Res<Controls>) {
+fn update_text(
+    mut text: Single<&mut Text>,
+    cur_state: Res<State<ColliderState>>,
+    controls: Res<Controls>,
+) {
     if !cur_state.is_changed() {
         return;
     }
