@@ -31,7 +31,7 @@ pub struct TankBundle {
 
 impl TankBundle {
     pub fn new(spawn_location: Transform, sprite: Sprite) -> TankBundle {
-        const SHOOT_LOCATION: Vec3 = Vec3::new(0., 50., 0.);
+        const SHOOT_LOCATION: Vec3 = Vec3::new(0., 55., 0.);
         let collider = BoundingPolygon::new(Box::new([
             Vec2::new(-25., -25.),
             Vec2::new(-25., 25.),

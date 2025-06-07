@@ -104,7 +104,7 @@ fn shoot(
 
             let direction = transform.rotation * Vec3::Y;
 
-            let position = transform.translation + direction * tank.shoot_location;
+            let position = transform.translation + transform.rotation * tank.shoot_location;
             let spawn_location = Transform::from_translation(position)
                 .with_scale(Vec3::splat(resolution.projectile_pixel_ratio));
             commands.spawn(BulletBundle::new(
