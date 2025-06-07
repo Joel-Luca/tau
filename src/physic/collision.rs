@@ -35,7 +35,7 @@ pub enum Collider {
 }
 
 impl Collider {
-    fn intersects(&self, other: &Collider) -> bool {
+    pub fn intersects(&self, other: &Collider) -> bool {
         match &*self {
             Collider::Polygon(a) => match &*other {
                 Collider::Polygon(collided_a) => a.intersects_volume(collided_a),
