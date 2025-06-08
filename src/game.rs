@@ -4,6 +4,7 @@ use crate::configuration;
 use crate::enemy;
 use crate::physic;
 use crate::player;
+use crate::projectile;
 use crate::tank;
 
 pub struct GamePlugin;
@@ -15,9 +16,10 @@ impl Plugin for GamePlugin {
             enemy::EnemyPlugin,
             player::PlayerPlugin,
             physic::PhysicPlugin,
+            projectile::ProjectilePlugin,
             tank::TankPlugin,
         ))
-        .add_systems(Startup, setup_scene);
+            .add_systems(Startup, setup_scene);
     }
 }
 

@@ -5,7 +5,6 @@ use bevy::prelude::*;
 use crate::configuration::controls::*;
 use crate::configuration::resolution::*;
 use crate::configuration::*;
-use crate::physic::collision::Collider;
 use crate::projectile::bullet::*;
 use crate::tank::*;
 
@@ -14,7 +13,6 @@ pub struct PlayerPlugin;
 impl Plugin for PlayerPlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(Startup, setup_player)
-            .add_systems(Update, check_bullet_collision)
             .add_systems(Update, (move_player, shoot).chain());
     }
 }
@@ -116,21 +114,6 @@ fn shoot(
                 &assets_server,
                 &configuration,
             ));
-        }
-    }
-}
-
-fn check_bullet_collision(
-    mut commands: Commands,
-    mut player_query: Query<(Entity, &Collider), With<Player>>,
-    mut bullet_query: Query<(Entity, &Collider), With<Bullet>>,
-) {
-    for (player, player_c) in player_query.iter() {
-        for (bullet, bullet_c) in bullet_query.iter() {
-            if player_c.intersects(bullet_c) {
-                commands.entity(player).despawn();
-                commands.entity(bullet).despawn();
-            }
         }
     }
 }
