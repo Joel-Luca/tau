@@ -14,8 +14,8 @@ impl Plugin for GamePlugin {
         app.add_plugins((
             configuration::ConfigurationPlugin,
             enemy::EnemyPlugin,
-            player::PlayerPlugin,
             physic::PhysicPlugin,
+            player::PlayerPlugin,
             projectile::ProjectilePlugin,
             tank::TankPlugin,
         ))
