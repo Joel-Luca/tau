@@ -1,5 +1,6 @@
 use bevy::prelude::*;
 
+pub mod ability;
 pub mod configuration;
 pub mod enemy;
 pub mod game;

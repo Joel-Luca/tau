@@ -12,6 +12,7 @@ impl Plugin for ResolutionPlugin {
 pub struct Resolution {
     pub screen_dimensions: Vec2,
     pub ammunition_pixel_ratio: f32,
+    pub mine_pixel_ratio: f32,
     pub projectile_pixel_ratio: f32,
     pub tank_pixel_ratio: f32,
 }
@@ -21,6 +22,7 @@ fn setup_resolution(mut commands: Commands, window_query: Query<&Window>) {
     commands.insert_resource(Resolution {
         screen_dimensions: Vec2::new(window.width(), window.height()),
         ammunition_pixel_ratio: 0.05,
+        mine_pixel_ratio: 0.05,
         projectile_pixel_ratio: 0.01,
         tank_pixel_ratio: 0.1,
     })

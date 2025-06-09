@@ -4,7 +4,7 @@ use crate::projectile::bullet::Bullet;
 use bevy::prelude::*;
 
 pub mod bullet;
-
+pub mod mine;
 
 pub struct ProjectilePlugin;
 

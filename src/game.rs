@@ -1,5 +1,6 @@
 use bevy::prelude::*;
 
+use crate::ability;
 use crate::configuration;
 use crate::enemy;
 use crate::physic;
@@ -12,6 +13,7 @@ pub struct GamePlugin;
 impl Plugin for GamePlugin {
     fn build(&self, app: &mut App) {
         app.add_plugins((
+            ability::AbilityPlugin,
             configuration::ConfigurationPlugin,
             enemy::EnemyPlugin,
             physic::PhysicPlugin,
@@ -19,7 +21,7 @@ impl Plugin for GamePlugin {
             projectile::ProjectilePlugin,
             tank::TankPlugin,
         ))
-            .add_systems(Startup, setup_scene);
+        .add_systems(Startup, setup_scene);
     }
 }
 
