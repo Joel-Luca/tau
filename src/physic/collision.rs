@@ -150,10 +150,7 @@ fn intersection_system(
     }
 }
 
-fn update_text(
-    mut text: Single<&mut Text>,
-    cur_state: Res<State<ColliderState>>,
-) {
+fn update_text(mut text: Single<&mut Text>, cur_state: Res<State<ColliderState>>) {
     if !cur_state.is_changed() {
         return;
     }

@@ -14,14 +14,13 @@ impl Plugin for ProjectilePlugin {
     }
 }
 
-
 #[derive(Component)]
 pub struct Projectile {}
 
 fn check_projectile_collision(
     mut commands: Commands,
-    mut player_query: Query<(Entity, &Collider), With<Player>>,
-    mut projectile_query: Query<(Entity, &Collider), With<Projectile>>,
+    player_query: Query<(Entity, &Collider), With<Player>>,
+    projectile_query: Query<(Entity, &Collider), With<Projectile>>,
 ) {
     for (player, player_c) in player_query.iter() {
         for (bullet, projectile_) in projectile_query.iter() {
@@ -32,4 +31,3 @@ fn check_projectile_collision(
         }
     }
 }
-

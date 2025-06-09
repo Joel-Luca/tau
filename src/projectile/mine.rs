@@ -1,8 +1,8 @@
 use std::time::SystemTime;
 
-use crate::ability::hide::Hide;
-use crate::configuration::resolution::Resolution;
-use crate::configuration::Configuration;
+use crate::ability::hide::*;
+use crate::configuration::resolution::*;
+use crate::configuration::*;
 use crate::physic::collision::*;
 use crate::projectile::*;
 
