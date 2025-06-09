@@ -5,6 +5,7 @@ use bevy::prelude::*;
 
 pub mod bullet;
 pub mod mine;
+pub mod shuriken;
 
 pub struct ProjectilePlugin;
 

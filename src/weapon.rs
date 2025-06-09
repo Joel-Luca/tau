@@ -5,16 +5,18 @@ use crate::configuration::resolution::*;
 use crate::configuration::*;
 use crate::projectile::bullet::*;
 use crate::projectile::mine::*;
+use crate::projectile::shuriken::ShurikenBundle;
 
 #[derive(Component)]
 pub enum Weapon {
     Bullet,
     Mine,
+    Shuriken,
 }
 
 impl Weapon {
     pub fn default() -> Weapon {
-        Weapon::Bullet
+        Weapon::Shuriken
     }
 
     pub fn shoot(
@@ -25,9 +27,9 @@ impl Weapon {
         configuration: &Res<Configuration>,
         resolution: &Res<Resolution>,
     ) {
+        let direction = transform.rotation * Vec3::Y;
         match self {
             &Weapon::Bullet => {
-                let direction = transform.rotation * Vec3::Y;
                 commands.spawn(BulletBundle::new(
                     direction,
                     transform,
@@ -40,6 +42,15 @@ impl Weapon {
                 commands.spawn(MineBundle::new(
                     transform,
                     SystemTime::now(),
+                    assets_server,
+                    configuration,
+                    resolution,
+                ));
+            }
+            &Weapon::Shuriken => {
+                commands.spawn(ShurikenBundle::new(
+                    direction,
+                    transform,
                     assets_server,
                     configuration,
                     resolution,
