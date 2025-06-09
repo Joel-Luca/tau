@@ -21,6 +21,7 @@ pub struct Configuration {
     pub shoot_interval: u128,
     pub spawn_protection: f32,
     pub tank_mine_location: Vec3,
+    pub tank_shoot_location: Vec3,
 }
 
 fn setup_configuration(mut commands: Commands) {
@@ -32,5 +33,6 @@ fn setup_configuration(mut commands: Commands) {
         shoot_interval: 300,
         spawn_protection: 3.,
         tank_mine_location: Vec3::new(0., -55., 0.),
+        tank_shoot_location: Vec3::new(0., 55., 0.),
     })
 }

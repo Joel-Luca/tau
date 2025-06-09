@@ -8,6 +8,7 @@ pub mod physic;
 pub mod player;
 pub mod projectile;
 pub mod tank;
+pub mod weapon;
 
 fn main() {
     App::new()

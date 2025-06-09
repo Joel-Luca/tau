@@ -5,8 +5,8 @@ use bevy::prelude::*;
 use crate::configuration::controls::*;
 use crate::configuration::resolution::*;
 use crate::configuration::*;
-use crate::projectile::bullet::*;
 use crate::tank::*;
+use crate::weapon::Weapon;
 
 pub struct PlayerPlugin;
 
@@ -89,31 +89,26 @@ fn move_player(
 }
 
 fn shoot(
-    mut query: Query<(&mut Player, &Tank, &Transform)>,
+    mut query: Query<(&mut Player, &Transform, &Weapon)>,
     mut commands: Commands,
     assets_server: Res<AssetServer>,
     configuration: Res<Configuration>,
     resolution: Res<Resolution>,
     keys: Res<ButtonInput<KeyCode>>,
 ) {
-    for (mut player, tank, transform) in query.iter_mut() {
+    for (mut player, transform, weapon) in query.iter_mut() {
         let duration = SystemTime::now().duration_since(player.last_shot).unwrap();
         if keys.pressed(player.controls.shoot)
             && duration.as_millis() > configuration.shoot_interval
         {
             player.last_shot = SystemTime::now();
-
-            let direction = transform.rotation * Vec3::Y;
-
-            let position = transform.translation + transform.rotation * tank.shoot_location;
-            let spawn_location = Transform::from_translation(position)
-                .with_scale(Vec3::splat(resolution.projectile_pixel_ratio));
-            commands.spawn(BulletBundle::new(
-                spawn_location,
-                direction,
+            weapon.shoot(
+                transform,
                 &assets_server,
+                &mut commands,
                 &configuration,
-            ));
+                &resolution,
+            );
         }
     }
 }
