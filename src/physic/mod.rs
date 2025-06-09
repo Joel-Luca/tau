@@ -1,5 +1,6 @@
 use bevy::prelude::*;
 
+pub mod bounce;
 pub mod collision;
 pub mod velocity;
 

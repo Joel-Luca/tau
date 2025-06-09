@@ -8,6 +8,7 @@ pub mod physic;
 pub mod player;
 pub mod projectile;
 pub mod tank;
+pub mod wall;
 pub mod weapon;
 
 fn main() {
