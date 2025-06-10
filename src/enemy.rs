@@ -1,7 +1,6 @@
 use bevy::prelude::*;
 
-use crate::configuration::resolution::*;
-use crate::tank::*;
+use crate::configuration::resolution::Resolution;
 
 pub struct EnemyPlugin;
 

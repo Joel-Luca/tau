@@ -1,8 +1,11 @@
+use bevy::prelude::*;
+
 use crate::configuration::Configuration;
 use crate::configuration::resolution::Resolution;
-use crate::physic::collision::*;
-use crate::physic::velocity::*;
-use crate::projectile::*;
+use crate::physic::bounding_circle::BoundingCircle;
+use crate::physic::collision::{Collider, Intersects};
+use crate::physic::velocity::Velocity;
+use crate::projectile::Projectile;
 
 #[derive(Component)]
 pub struct Bullet {}

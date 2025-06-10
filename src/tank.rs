@@ -1,7 +1,8 @@
 use bevy::prelude::*;
 
-use crate::configuration::*;
-use crate::physic::collision::*;
+use crate::configuration::Configuration;
+use crate::physic::bounding_polygon::BoundingPolygon;
+use crate::physic::collision::{Collider, Intersects};
 use crate::weapon::Weapon;
 
 pub struct TankPlugin;

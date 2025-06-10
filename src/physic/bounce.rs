@@ -1,7 +1,8 @@
-use crate::physic::collision::Collider;
-use crate::physic::velocity::*;
-use crate::wall::*;
 use bevy::prelude::*;
+
+use crate::physic::collision::Collider;
+use crate::physic::velocity::Velocity;
+use crate::wall::Wall;
 
 pub struct BouncePlugin;
 

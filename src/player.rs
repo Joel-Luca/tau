@@ -2,10 +2,10 @@ use std::time::SystemTime;
 
 use bevy::prelude::*;
 
-use crate::configuration::controls::*;
-use crate::configuration::resolution::*;
-use crate::configuration::*;
-use crate::tank::*;
+use crate::configuration::Configuration;
+use crate::configuration::controls::{Controls, Movement};
+use crate::configuration::resolution::Resolution;
+use crate::tank::TankBundle;
 use crate::weapon::Weapon;
 
 pub struct PlayerPlugin;

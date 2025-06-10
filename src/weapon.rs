@@ -1,10 +1,10 @@
 use bevy::prelude::*;
 use std::time::SystemTime;
 
-use crate::configuration::resolution::*;
-use crate::configuration::*;
-use crate::projectile::bullet::*;
-use crate::projectile::mine::*;
+use crate::configuration::Configuration;
+use crate::configuration::resolution::Resolution;
+use crate::projectile::bullet::BulletBundle;
+use crate::projectile::mine::MineBundle;
 use crate::projectile::shuriken::ShurikenBundle;
 
 #[derive(Component)]

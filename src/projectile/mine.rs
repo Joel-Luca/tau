@@ -1,10 +1,12 @@
+use bevy::prelude::*;
 use std::time::SystemTime;
 
-use crate::ability::hide::*;
-use crate::configuration::resolution::*;
-use crate::configuration::*;
-use crate::physic::collision::*;
-use crate::projectile::*;
+use crate::ability::hide::Hide;
+use crate::configuration::Configuration;
+use crate::configuration::resolution::Resolution;
+use crate::physic::bounding_circle::BoundingCircle;
+use crate::physic::collision::{Collider, Intersects};
+use crate::projectile::Projectile;
 
 #[derive(Component)]
 pub struct Mine {}

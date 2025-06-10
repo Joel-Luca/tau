@@ -1,4 +1,3 @@
-use bevy::input::keyboard::Key;
 use bevy::prelude::*;
 
 pub struct ControlsPlugin;
