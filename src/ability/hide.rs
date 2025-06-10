@@ -16,7 +16,7 @@ impl Plugin for HidePlugin {
     }
 }
 
-fn check_hide(mut commands: Commands, query: Query<(Entity, &Hide), With<(Sprite)>>) {
+fn check_hide(mut commands: Commands, query: Query<(Entity, &Hide), With<Sprite>>) {
     for (
         entity,
         Hide {
