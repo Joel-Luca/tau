@@ -14,6 +14,7 @@ pub struct Resolution {
     pub ammunition_pixel_ratio: f32,
     pub mine_pixel_ratio: f32,
     pub projectile_pixel_ratio: f32,
+    pub shuriken_pixel_ratio: f32,
     pub tank_pixel_ratio: f32,
 }
 
@@ -24,6 +25,7 @@ fn setup_resolution(mut commands: Commands, window_query: Query<&Window>) {
         ammunition_pixel_ratio: 0.05,
         mine_pixel_ratio: 0.05,
         projectile_pixel_ratio: 0.01,
+        shuriken_pixel_ratio: 0.05,
         tank_pixel_ratio: 0.1,
     })
 }

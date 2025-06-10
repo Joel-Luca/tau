@@ -39,7 +39,7 @@ impl ShurikenBundle {
         let position: Vec3 =
             tank_position.translation + tank_position.rotation * configuration.tank_shoot_location;
         let spawn_location = Transform::from_translation(position)
-            .with_scale(Vec3::splat(resolution.projectile_pixel_ratio));
+            .with_scale(Vec3::splat(resolution.shuriken_pixel_ratio));
         let velocity = configuration.shuriken_speed * direction;
         ShurikenBundle {
             bounce: Bounce { bounce_count: configuration.shuriken_bounce_count },
