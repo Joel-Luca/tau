@@ -12,23 +12,25 @@ impl Plugin for BouncePlugin {
     }
 }
 
-#[derive(Component, Deref, DerefMut)]
+#[derive(Component)]
 pub struct Bounce {
     pub bounce_count: u32,
+    pub last_bounce: Entity,
 }
 
 fn apply_bounce(
     mut commands: Commands,
     mut bounce_query: Query<(Entity, &mut Velocity, &mut Bounce, &Collider)>,
-    wall_query: Query<&Collider, With<Wall>>,
+    wall_query: Query<(Entity, &Collider), With<Wall>>,
 ) {
     for (entity, mut velocity, mut bounce, bounce_collider) in bounce_query.iter_mut() {
-        for wall_collider in wall_query.iter() {
-            if bounce_collider.intersects(wall_collider) {
+        for (wall_entity, wall_collider) in wall_query.iter() {
+            if bounce_collider.intersects(wall_collider) && bounce.last_bounce.index() != wall_entity.index() {
                 if bounce.bounce_count > 0 {
                     bounce.bounce_count -= 1;
-                    velocity.x = -velocity.x;
-                    velocity.y = -velocity.y;
+                    bounce.last_bounce = wall_entity;
+                    let surface = bounce_collider.get_contact_vector(wall_collider);
+                    **velocity = velocity.reflect(surface);
                 } else {
                     commands.entity(entity).despawn();
                 }

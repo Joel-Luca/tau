@@ -42,7 +42,10 @@ impl ShurikenBundle {
             .with_scale(Vec3::splat(resolution.shuriken_pixel_ratio));
         let velocity = configuration.shuriken_speed * direction;
         ShurikenBundle {
-            bounce: Bounce { bounce_count: configuration.shuriken_bounce_count },
+            bounce: Bounce {
+                bounce_count: configuration.shuriken_bounce_count,
+                last_bounce: Entity::PLACEHOLDER,
+            },
             collider: Collider::Circle(collider),
             intersects: Intersects::default(),
             projectile: Projectile {},
