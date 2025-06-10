@@ -1,5 +1,9 @@
-use crate::configuration::controls::Controls;
 use bevy::{color::palettes::css::*, prelude::*};
+
+use crate::configuration::controls::Controls;
+use crate::physic::bounding_circle::BoundingCircle;
+use crate::physic::bounding_polygon::BoundingPolygon;
+use crate::physic::bounding_volume::BoundingVolume;
 
 pub struct CollisionPlugin;
 
@@ -44,6 +48,19 @@ impl Collider {
             Collider::Circle(c) => match &*other {
                 Collider::Polygon(collided_a) => c.intersects_volume(collided_a),
                 Collider::Circle(collided_c) => c.intersects_volume(collided_c),
+            },
+        }
+    }
+
+    pub fn get_contact_vector(&self, other: &Collider) -> Vec3 {
+        match &*self {
+            Collider::Polygon(a) => match &*other {
+                Collider::Polygon(collided_a) => a.get_contact_vector(collided_a),
+                Collider::Circle(collided_c) => a.get_contact_vector(collided_c),
+            },
+            Collider::Circle(c) => match &*other {
+                Collider::Polygon(collided_a) => c.get_contact_vector(collided_a),
+                Collider::Circle(collided_c) => c.get_contact_vector(collided_c),
             },
         }
     }
@@ -166,182 +183,7 @@ fn update_text(mut text: Single<&mut Text>, cur_state: Res<State<ColliderState>>
     text.push_str("\nPress F1 to cycle");
 }
 
-pub trait BoundingVolume {}
-
-pub struct BoundingPolygon {
-    pub relative_vertices: Box<[Vec2]>,
-    pub vertices: Box<[Vec2]>,
-}
-
-impl BoundingVolume for BoundingPolygon {}
-
-pub struct BoundingCircle {
-    pub radius: f32,
-    pub center: Vec2,
-}
-
-impl BoundingVolume for BoundingCircle {}
-
-impl BoundingPolygon {
-    pub fn new(vertices: Box<[Vec2]>) -> BoundingPolygon {
-        let absolute_vertices = vertices.clone();
-        BoundingPolygon {
-            relative_vertices: vertices,
-            vertices: absolute_vertices,
-        }
-    }
-
-    pub fn update_vertices(&mut self, transform: &Transform) {
-        for (index, vertex) in self.relative_vertices.iter().enumerate() {
-            self.vertices[index].x = transform.translation.x + vertex.x;
-            self.vertices[index].y = transform.translation.y + vertex.y;
-        }
-    }
-
-    fn project_vertices(&self, vertices: &Box<[Vec2]>, axis: Vec2) -> (f32, f32) {
-        let mut min = f32::MAX;
-        let mut max = f32::MIN;
-
-        for vertex in vertices {
-            let projection = vertex.dot(axis);
-
-            if projection < min {
-                min = projection;
-            }
-
-            if projection > max {
-                max = projection;
-            }
-        }
-
-        (min, max)
-    }
-
-    pub fn get_closest_vertex(&self, point: Vec2) -> Vec2 {
-        let mut closest: Vec2 = Default::default();
-        let mut min: f32 = f32::MAX;
-
-        for vertex in self.vertices.iter() {
-            let distance = vertex.distance(point);
-
-            if distance < min {
-                min = distance;
-                closest = vertex.clone();
-            }
-        }
-
-        closest
-    }
-
-    pub fn intersects_circle(&self, circle: &BoundingCircle) -> bool {
-        for (index, vertex) in self.vertices.iter().enumerate() {
-            let next_vertex = &self.vertices[(index + 1) % self.vertices.len()];
-
-            let edge = next_vertex - vertex;
-            let axis = Vec2::new(-edge.y, edge.x).normalize();
-
-            let (min_a, max_a) = self.project_vertices(&self.vertices, axis);
-            let (min_b, max_b) = circle.project_circle(axis);
-
-            if min_a >= max_b || min_b >= max_a {
-                return false;
-            }
-        }
-
-        let closest = self.get_closest_vertex(circle.center);
-        let axis = (closest - circle.center).normalize();
-
-        let (min_a, max_a) = self.project_vertices(&self.vertices, axis);
-        let (min_b, max_b) = circle.project_circle(axis);
-
-        if min_a >= max_b || min_b >= max_a {
-            return false;
-        }
-
-        true
-    }
-}
-
-impl BoundingCircle {
-    pub fn update_center(&mut self, transform: &Transform) {
-        self.center = transform.translation.xy();
-    }
-
-    fn project_circle(&self, axis: Vec2) -> (f32, f32) {
-        let direction = axis.normalize();
-        let vector = self.radius * direction;
-        let p1 = self.center + vector;
-        let p2 = self.center - vector;
-
-        let mut min = p1.dot(axis);
-        let mut max = p2.dot(axis);
-
-        if min > max {
-            let temp = min;
-            min = max;
-            max = temp;
-        }
-
-        (min, max)
-    }
-}
-
 pub trait IntersectsVolume<Volume: BoundingVolume + ?Sized> {
     fn intersects_volume(&self, volume: &Volume) -> bool;
-}
-
-impl IntersectsVolume<Self> for BoundingPolygon {
-    fn intersects_volume(&self, other_polygon: &BoundingPolygon) -> bool {
-        for (index, vertex) in self.vertices.iter().enumerate() {
-            let next_vertex = &self.vertices[(index + 1) % self.vertices.len()];
-
-            let edge = next_vertex - vertex;
-            let axis = Vec2::new(-edge.y, edge.x).normalize();
-
-            let (min_a, max_a) = self.project_vertices(&self.vertices, axis);
-            let (min_b, max_b) = other_polygon.project_vertices(&other_polygon.vertices, axis);
-
-            if min_a >= max_b || min_b >= max_a {
-                return false;
-            }
-        }
-        for (index, vertex) in other_polygon.vertices.iter().enumerate() {
-            let next_vertex = &other_polygon.vertices[(index + 1) % other_polygon.vertices.len()];
-
-            let edge = next_vertex - vertex;
-            let axis = Vec2::new(-edge.y, edge.x).normalize();
-
-            let (min_a, max_a) = self.project_vertices(&self.vertices, axis);
-            let (min_b, max_b) = other_polygon.project_vertices(&other_polygon.vertices, axis);
-
-            if min_a >= max_b || min_b >= max_a {
-                return false;
-            }
-        }
-        true
-    }
-}
-
-impl IntersectsVolume<BoundingCircle> for BoundingPolygon {
-    fn intersects_volume(&self, circle: &BoundingCircle) -> bool {
-        self.intersects_circle(circle)
-    }
-}
-
-impl IntersectsVolume<Self> for BoundingCircle {
-    fn intersects_volume(&self, circle: &BoundingCircle) -> bool {
-        let distance: f32 = self.center.distance(circle.center);
-        let radii: f32 = self.radius + circle.radius;
-
-        if distance >= radii {
-            return false;
-        }
-        true
-    }
-}
-
-impl IntersectsVolume<BoundingPolygon> for BoundingCircle {
-    fn intersects_volume(&self, polygon: &BoundingPolygon) -> bool {
-        polygon.intersects_circle(self)
-    }
+    fn get_contact_vector(&self, volume: &Volume) -> Vec3;
 }
