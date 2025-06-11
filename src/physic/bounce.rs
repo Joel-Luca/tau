@@ -8,7 +8,7 @@ pub struct BouncePlugin;
 
 impl Plugin for BouncePlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(FixedUpdate, apply_bounce);
+        app.add_systems(PreUpdate, apply_bounce);
     }
 }
 
