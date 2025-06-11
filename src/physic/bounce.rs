@@ -30,7 +30,7 @@ fn apply_bounce(
                     bounce.bounce_count -= 1;
                     bounce.last_bounce = wall_entity;
                     let surface = bounce_collider.get_contact_vector(wall_collider);
-                    **velocity = velocity.reflect(surface);
+                    **velocity = -velocity.reflect(surface.normalize());
                 } else {
                     commands.entity(entity).despawn();
                 }

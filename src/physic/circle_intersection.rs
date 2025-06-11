@@ -18,7 +18,7 @@ impl IntersectsVolume<Self> for BoundingCircle {
     fn get_contact_vector(&self, circle: &BoundingCircle) -> Vec3 {
         let ab = circle.center - self.center;
         let vec = self.center + ab.normalize() * self.radius;
-        Vec3::new(-vec.y, vec.x, 0.).normalize()
+        Vec3::new(-vec.y, vec.x, 0.)
     }
 }
 
@@ -39,6 +39,6 @@ impl IntersectsVolume<BoundingPolygon> for BoundingCircle {
                 vec = next_vertex - vertex;
             }
         }
-        Vec3::new(vec.x, vec.y, 0.).normalize()
+        Vec3::new(vec.x, vec.y, 0.)
     }
 }

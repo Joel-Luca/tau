@@ -48,7 +48,7 @@ impl IntersectsVolume<Self> for BoundingPolygon {
                 vec = result;
             }
         }
-        Vec3::new(vec.x, vec.y, 0.0).normalize()
+        Vec3::new(vec.x, vec.y, 0.0)
     }
 }
 
@@ -69,6 +69,6 @@ impl IntersectsVolume<BoundingCircle> for BoundingPolygon {
                 vec = result;
             }
         }
-        Vec3::new(vec.x, vec.y, 0.0).normalize()
+        Vec3::new(vec.x, vec.y, 0.0)
     }
 }
