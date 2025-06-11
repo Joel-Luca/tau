@@ -3,12 +3,12 @@ use bevy::prelude::*;
 pub mod ability;
 pub mod configuration;
 pub mod enemy;
+pub mod environment;
 pub mod game;
 pub mod physic;
 pub mod player;
 pub mod projectile;
 pub mod tank;
-pub mod wall;
 pub mod weapon;
 
 fn main() {

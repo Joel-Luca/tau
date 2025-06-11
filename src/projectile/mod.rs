@@ -1,9 +1,9 @@
 use bevy::prelude::*;
 
+use crate::environment::wall::Wall;
 use crate::physic::bounce::Bounce;
 use crate::physic::collision::Collider;
 use crate::player::Player;
-use crate::wall::Wall;
 
 pub mod bullet;
 pub mod mine;

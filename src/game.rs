@@ -3,11 +3,11 @@ use bevy::prelude::*;
 use crate::ability;
 use crate::configuration;
 use crate::enemy;
+use crate::environment;
 use crate::physic;
 use crate::player;
 use crate::projectile;
 use crate::tank;
-use crate::wall;
 
 pub struct GamePlugin;
 
@@ -21,7 +21,7 @@ impl Plugin for GamePlugin {
             player::PlayerPlugin,
             projectile::ProjectilePlugin,
             tank::TankPlugin,
-            wall::WallPlugin,
+            environment::EnvironmentPlugin,
         ))
         .add_systems(Startup, setup_scene);
     }
