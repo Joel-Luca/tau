@@ -7,6 +7,7 @@ pub mod bounding_volume;
 pub mod circle_intersection;
 pub mod collision;
 pub mod polygon_intersection;
+pub mod solid;
 pub mod velocity;
 
 pub struct PhysicPlugin;

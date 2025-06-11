@@ -2,6 +2,7 @@ use bevy::prelude::*;
 
 use crate::physic::bounding_polygon::BoundingPolygon;
 use crate::physic::collision::{Collider, Intersects};
+use crate::physic::solid::Solid;
 
 pub struct WallPlugin;
 
@@ -18,6 +19,7 @@ pub struct Wall {}
 pub struct WallBundle {
     collider: Collider,
     intersects: Intersects,
+    solid: Solid,
     transform: Transform,
     wall: Wall,
 }
@@ -27,6 +29,7 @@ impl WallBundle {
         WallBundle {
             collider: Collider::Polygon(BoundingPolygon::new(vertices)),
             intersects: Intersects::default(),
+            solid: Solid {},
             transform,
             wall: Wall {},
         }

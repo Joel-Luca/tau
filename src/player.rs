@@ -2,9 +2,11 @@ use std::time::SystemTime;
 
 use bevy::prelude::*;
 
-use crate::configuration::Configuration;
 use crate::configuration::controls::{Controls, Movement};
 use crate::configuration::resolution::Resolution;
+use crate::configuration::Configuration;
+use crate::physic::collision::Collider;
+use crate::physic::solid::Solid;
 use crate::tank::TankBundle;
 use crate::weapon::Weapon;
 
@@ -40,26 +42,29 @@ fn setup_player(
 ) {
     let player_1_texture = assets_server.load("player/tank_yellow.png");
     let player_2_texture = assets_server.load("player/tank_pink.png");
-    let spawn_location = Transform::from_translation(Vec3::new(0., 0., 0.))
+    let spawn_location_1 = Transform::from_translation(Vec3::new(0., 0., 0.))
+        .with_scale(Vec3::splat(resolution.tank_pixel_ratio));
+    let spawn_location_2 = Transform::from_translation(Vec3::new(-100., 0., 0.))
         .with_scale(Vec3::splat(resolution.tank_pixel_ratio));
     commands.spawn((
         Player::new(controls.movement.clone()),
-        TankBundle::new(spawn_location, Sprite::from_image(player_1_texture)),
+        TankBundle::new(spawn_location_1, Sprite::from_image(player_1_texture)),
     ));
 
     commands.spawn((
         Player::new(controls.second_movement.clone()),
-        TankBundle::new(spawn_location, Sprite::from_image(player_2_texture)),
+        TankBundle::new(spawn_location_2, Sprite::from_image(player_2_texture)),
     ));
 }
 
 fn move_player(
-    mut query: Query<(&mut Transform, &Player)>,
+    mut query: Query<(&mut Transform, &Player, &Collider)>,
+    solid_query: Query<&Collider, With<Solid>>,
     time: Res<Time>,
     keys: Res<ButtonInput<KeyCode>>,
     configuration: Res<Configuration>,
 ) {
-    for (mut transform, player) in query.iter_mut() {
+    for (mut transform, player, player_c) in query.iter_mut() {
         let mut movement = 0.;
         let mut rotation = 0.;
 

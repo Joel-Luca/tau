@@ -3,6 +3,7 @@ use bevy::prelude::*;
 use crate::configuration::Configuration;
 use crate::physic::bounding_polygon::BoundingPolygon;
 use crate::physic::collision::{Collider, Intersects};
+use crate::physic::solid::Solid;
 use crate::weapon::Weapon;
 
 pub struct TankPlugin;
@@ -25,6 +26,7 @@ pub struct Tank {
 pub struct TankBundle {
     collider: Collider,
     intersects: Intersects,
+    solid: Solid,
     sprite: Sprite,
     tank: Tank,
     transform: Transform,
@@ -43,6 +45,7 @@ impl TankBundle {
         TankBundle {
             collider: Collider::Polygon(collider),
             intersects: Intersects::default(),
+            solid: Solid {},
             sprite,
             tank: Tank {
                 deaths: 0,
