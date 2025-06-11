@@ -13,6 +13,10 @@ pub struct PhysicPlugin;
 
 impl Plugin for PhysicPlugin {
     fn build(&self, app: &mut App) {
-        app.add_plugins((bounce::BouncePlugin, collision::CollisionPlugin, velocity::VelocityPlugin));
+        app.add_plugins((
+            bounce::BouncePlugin,
+            collision::CollisionPlugin,
+            velocity::VelocityPlugin,
+        ));
     }
 }

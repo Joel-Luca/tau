@@ -23,7 +23,7 @@ impl Plugin for GamePlugin {
             tank::TankPlugin,
             wall::WallPlugin,
         ))
-            .add_systems(Startup, setup_scene);
+        .add_systems(Startup, setup_scene);
     }
 }
 

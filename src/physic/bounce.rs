@@ -25,7 +25,9 @@ fn apply_bounce(
 ) {
     for (entity, mut velocity, mut bounce, bounce_collider) in bounce_query.iter_mut() {
         for (wall_entity, wall_collider) in wall_query.iter() {
-            if bounce_collider.intersects(wall_collider) && bounce.last_bounce.index() != wall_entity.index() {
+            if bounce_collider.intersects(wall_collider)
+                && bounce.last_bounce.index() != wall_entity.index()
+            {
                 if bounce.bounce_count > 0 {
                     bounce.bounce_count -= 1;
                     bounce.last_bounce = wall_entity;

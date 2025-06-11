@@ -11,7 +11,6 @@ impl Plugin for WallPlugin {
     }
 }
 
-
 #[derive(Component)]
 pub struct Wall {}
 
