@@ -4,6 +4,8 @@ use crate::configuration::controls::Controls;
 use crate::physic::bounding_circle::BoundingCircle;
 use crate::physic::bounding_polygon::BoundingPolygon;
 use crate::physic::bounding_volume::BoundingVolume;
+use crate::physic::solid::Solid;
+use crate::player::Player;
 
 pub struct CollisionPlugin;
 
@@ -17,6 +19,7 @@ impl Plugin for CollisionPlugin {
                 PostUpdate,
                 (
                     update_colliders,
+                    check_player_collision,
                     render_colliders.run_if(in_state(ColliderState::Visible)),
                     intersection_system.run_if(in_state(ColliderState::Visible)),
                 )
@@ -186,4 +189,18 @@ fn update_text(mut text: Single<&mut Text>, cur_state: Res<State<ColliderState>>
 pub trait IntersectsVolume<Volume: BoundingVolume + ?Sized> {
     fn intersects_volume(&self, volume: &Volume) -> bool;
     fn get_contact_vector(&self, volume: &Volume) -> Vec3;
+}
+
+fn check_player_collision(
+    mut player_query: Query<(Entity, &mut Transform, &Player, &Collider)>,
+    solid_query: Query<(Entity, &Collider), With<Solid>>,
+) {
+    for (player_entity, mut transform, player, player_c) in player_query.iter_mut() {
+        for (solid_entity, solid_c) in solid_query.iter() {
+            if player_entity.index() != solid_entity.index() && player_c.intersects(solid_c) {
+                player.reset_pos(&mut transform);
+                return;
+            }
+        }
+    }
 }

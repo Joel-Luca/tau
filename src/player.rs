@@ -5,8 +5,6 @@ use bevy::prelude::*;
 use crate::configuration::controls::{Controls, Movement};
 use crate::configuration::resolution::Resolution;
 use crate::configuration::Configuration;
-use crate::physic::collision::Collider;
-use crate::physic::solid::Solid;
 use crate::tank::TankBundle;
 use crate::weapon::Weapon;
 
@@ -23,6 +21,7 @@ impl Plugin for PlayerPlugin {
 pub struct Player {
     controls: Movement,
     last_shot: SystemTime,
+    last_pos: Vec3,
 }
 
 impl Player {
@@ -30,7 +29,12 @@ impl Player {
         Player {
             controls,
             last_shot: SystemTime::now(),
+            last_pos: Vec3::ZERO,
         }
+    }
+
+    pub fn reset_pos(&self, transform: &mut Transform) {
+        transform.translation = self.last_pos;
     }
 }
 
@@ -58,13 +62,12 @@ fn setup_player(
 }
 
 fn move_player(
-    mut query: Query<(&mut Transform, &Player, &Collider)>,
-    solid_query: Query<&Collider, With<Solid>>,
+    mut query: Query<(&mut Transform, &mut Player)>,
     time: Res<Time>,
     keys: Res<ButtonInput<KeyCode>>,
     configuration: Res<Configuration>,
 ) {
-    for (mut transform, player, player_c) in query.iter_mut() {
+    for (mut transform, mut player) in query.iter_mut() {
         let mut movement = 0.;
         let mut rotation = 0.;
 
@@ -89,6 +92,7 @@ fn move_player(
         let direction = transform.rotation * Vec3::Y;
         let distance = movement * configuration.move_speed * time.delta_secs();
 
+        player.last_pos = transform.translation;
         transform.translation += direction * distance;
     }
 }
