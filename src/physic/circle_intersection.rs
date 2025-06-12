@@ -8,11 +8,7 @@ impl IntersectsVolume<Self> for BoundingCircle {
     fn intersects_volume(&self, circle: &BoundingCircle) -> bool {
         let distance: f32 = self.center.distance(circle.center);
         let radii: f32 = self.radius + circle.radius;
-
-        if distance >= radii {
-            return false;
-        }
-        true
+        distance < radii
     }
 
     fn get_contact_vector(&self, circle: &BoundingCircle) -> Vec3 {
