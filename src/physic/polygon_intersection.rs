@@ -12,8 +12,8 @@ impl IntersectsVolume<Self> for BoundingPolygon {
             let edge = next_vertex - vertex;
             let axis = Vec2::new(-edge.y, edge.x).normalize();
 
-            let (min_a, max_a) = self.project_vertices(&self.vertices, axis);
-            let (min_b, max_b) = other_polygon.project_vertices(&other_polygon.vertices, axis);
+            let (min_a, max_a) = self.project_vertices(axis);
+            let (min_b, max_b) = other_polygon.project_vertices(axis);
 
             if min_a >= max_b || min_b >= max_a {
                 return false;
@@ -25,8 +25,8 @@ impl IntersectsVolume<Self> for BoundingPolygon {
             let edge = next_vertex - vertex;
             let axis = Vec2::new(-edge.y, edge.x).normalize();
 
-            let (min_a, max_a) = self.project_vertices(&self.vertices, axis);
-            let (min_b, max_b) = other_polygon.project_vertices(&other_polygon.vertices, axis);
+            let (min_a, max_a) = self.project_vertices(axis);
+            let (min_b, max_b) = other_polygon.project_vertices(axis);
 
             if min_a >= max_b || min_b >= max_a {
                 return false;

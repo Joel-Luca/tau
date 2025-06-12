@@ -23,11 +23,11 @@ impl BoundingPolygon {
         }
     }
 
-    pub(crate) fn project_vertices(&self, vertices: &Box<[Vec2]>, axis: Vec2) -> (f32, f32) {
+    pub fn project_vertices(&self, axis: Vec2) -> (f32, f32) {
         let mut min = f32::MAX;
         let mut max = f32::MIN;
 
-        for vertex in vertices {
+        for vertex in self.vertices.iter() {
             let projection = vertex.dot(axis);
 
             if projection < min {
@@ -65,7 +65,7 @@ impl BoundingPolygon {
             let edge = next_vertex - vertex;
             let axis = Vec2::new(-edge.y, edge.x).normalize();
 
-            let (min_a, max_a) = self.project_vertices(&self.vertices, axis);
+            let (min_a, max_a) = self.project_vertices(axis);
             let (min_b, max_b) = circle.project_circle(axis);
 
             if min_a >= max_b || min_b >= max_a {
@@ -76,7 +76,7 @@ impl BoundingPolygon {
         let closest = self.get_closest_vertex(circle.center);
         let axis = (closest - circle.center).normalize();
 
-        let (min_a, max_a) = self.project_vertices(&self.vertices, axis);
+        let (min_a, max_a) = self.project_vertices(axis);
         let (min_b, max_b) = circle.project_circle(axis);
 
         if min_a >= max_b || min_b >= max_a {
