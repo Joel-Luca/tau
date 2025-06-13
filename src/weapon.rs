@@ -1,13 +1,14 @@
-use bevy::prelude::*;
-use std::time::SystemTime;
-
-use crate::configuration::Configuration;
 use crate::configuration::resolution::Resolution;
+use crate::configuration::Configuration;
 use crate::projectile::bullet::BulletBundle;
 use crate::projectile::mine::MineBundle;
 use crate::projectile::shuriken::ShurikenBundle;
+use bevy::prelude::*;
+use rand;
+use rand::Rng;
+use std::time::SystemTime;
 
-#[derive(Component)]
+#[derive(Component, Clone)]
 pub enum Weapon {
     Bullet,
     Mine,
@@ -15,8 +16,28 @@ pub enum Weapon {
 }
 
 impl Weapon {
+    pub fn random() -> Weapon {
+        let weapons = [
+            Weapon::Bullet,
+            Weapon::Mine,
+            Weapon::Shuriken,
+        ];
+        let index = rand::thread_rng().gen_range(0..weapons.len());
+        weapons[index].to_owned()
+    }
+
     pub fn default() -> Weapon {
         Weapon::Shuriken
+    }
+
+    pub fn get_asset_name(&self) -> String {
+        let weapon_str;
+        match &self {
+            Weapon::Bullet => weapon_str = "mg",
+            Weapon::Mine => weapon_str = "mine",
+            Weapon::Shuriken => weapon_str = "shuriken",
+        }
+        "chest_".to_string() + weapon_str + ".png"
     }
 
     pub fn shoot(

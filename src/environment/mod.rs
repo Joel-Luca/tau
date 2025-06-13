@@ -1,5 +1,6 @@
 use bevy::prelude::*;
 
+pub mod chest;
 pub mod wall;
 
 pub struct EnvironmentPlugin;
