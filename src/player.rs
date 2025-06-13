@@ -2,9 +2,9 @@ use std::time::SystemTime;
 
 use bevy::prelude::*;
 
+use crate::configuration::Configuration;
 use crate::configuration::controls::{Controls, Movement};
 use crate::configuration::resolution::Resolution;
-use crate::configuration::Configuration;
 use crate::tank::TankBundle;
 use crate::weapon::Weapon;
 
