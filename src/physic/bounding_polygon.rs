@@ -18,8 +18,9 @@ impl BoundingPolygon {
 
     pub fn update_vertices(&mut self, transform: &Transform) {
         for (index, vertex) in self.relative_vertices.iter().enumerate() {
-            self.vertices[index].x = transform.translation.x + vertex.x;
-            self.vertices[index].y = transform.translation.y + vertex.y;
+            let vertex_as_vec_3 = Vec3::new(vertex.x, vertex.y, 0.);
+            let new_vertex = transform.translation + transform.rotation * vertex_as_vec_3;
+            self.vertices[index] = new_vertex.xy();
         }
     }
 
