@@ -1,11 +1,10 @@
 use std::time::SystemTime;
 
 use bevy::prelude::*;
-use rand;
-use rand::Rng;
+use rand::random_range;
 
-use crate::configuration::Configuration;
 use crate::configuration::resolution::Resolution;
+use crate::configuration::Configuration;
 use crate::projectile::bullet::BulletBundle;
 use crate::projectile::mine::MineBundle;
 use crate::projectile::shuriken::ShurikenBundle;
@@ -20,7 +19,7 @@ pub enum Weapon {
 impl Weapon {
     pub fn random() -> Weapon {
         let weapons = [Weapon::Bullet, Weapon::Mine, Weapon::Shuriken];
-        let index = rand::thread_rng().gen_range(0..weapons.len());
+        let index = random_range(0..weapons.len());
         weapons[index].to_owned()
     }
 
