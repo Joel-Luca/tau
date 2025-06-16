@@ -20,7 +20,7 @@ pub struct Resolution {
 }
 
 fn setup_resolution(mut commands: Commands, window_query: Query<&Window>) {
-    let window = window_query.single();
+    let window = window_query.single().unwrap();
     commands.insert_resource(Resolution {
         screen_dimensions: Vec2::new(window.width(), window.height()),
         ammunition_pixel_ratio: 0.05,
