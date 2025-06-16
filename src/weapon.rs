@@ -3,8 +3,8 @@ use rand;
 use rand::Rng;
 use std::time::SystemTime;
 
-use crate::configuration::resolution::Resolution;
 use crate::configuration::Configuration;
+use crate::configuration::resolution::Resolution;
 use crate::projectile::bullet::BulletBundle;
 use crate::projectile::mine::MineBundle;
 use crate::projectile::shuriken::ShurikenBundle;
