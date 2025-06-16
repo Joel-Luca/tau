@@ -161,7 +161,7 @@ fn intersection_system(
             if collider.intersects(other_collider) {
                 collied = true;
 
-                events.send(CollisionEvent {
+                events.write(CollisionEvent {
                     entity,
                     collided_entity: other_entity,
                 });
