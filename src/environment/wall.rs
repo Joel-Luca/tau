@@ -1,8 +1,8 @@
 use bevy::prelude::*;
 
-use crate::physic::bounding_polygon::BoundingPolygon;
-use crate::physic::collision::Collider;
-use crate::physic::collision::Intersects;
+use crate::physic::collision::Collision;
+use crate::physic::collision::collider::Collider;
+use crate::physic::collision::polygon::PolygonCollider;
 use crate::physic::solid::Solid;
 
 pub struct WallPlugin;
@@ -18,20 +18,16 @@ pub struct Wall {}
 
 #[derive(Bundle)]
 pub struct WallBundle {
-    collider: Collider,
-    intersects: Intersects,
+    collider: Collision,
     solid: Solid,
-    transform: Transform,
     wall: Wall,
 }
 
 impl WallBundle {
     pub fn new(vertices: Box<[Vec2]>, transform: Transform) -> WallBundle {
         WallBundle {
-            collider: Collider::Polygon(BoundingPolygon::new(vertices)),
-            intersects: Intersects::default(),
+            collider: Collision::new(Collider::Polygon(PolygonCollider::new(vertices)), transform),
             solid: Solid {},
-            transform,
             wall: Wall {},
         }
     }

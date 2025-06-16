@@ -2,7 +2,7 @@ use bevy::prelude::*;
 
 use crate::environment::wall::Wall;
 use crate::physic::bounce::Bounce;
-use crate::physic::collision::Collider;
+use crate::physic::collision::collider::Collider;
 use crate::player::Player;
 
 pub mod bullet;

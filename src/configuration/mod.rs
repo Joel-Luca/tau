@@ -15,6 +15,7 @@ impl Plugin for ConfigurationPlugin {
 #[derive(Resource)]
 pub struct Configuration {
     pub bullet_speed: f32,
+    pub max_rocket_range: f32,
     pub mine_visible_duration: u128,
     pub move_speed: f32,
     pub rotation_speed: f32,
@@ -29,6 +30,7 @@ pub struct Configuration {
 fn setup_configuration(mut commands: Commands) {
     commands.insert_resource(Configuration {
         bullet_speed: 1000.,
+        max_rocket_range: f32::MAX,
         mine_visible_duration: 5000,
         move_speed: 200.,
         rotation_speed: 3.,

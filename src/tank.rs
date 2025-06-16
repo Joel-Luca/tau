@@ -1,9 +1,9 @@
 use bevy::prelude::*;
 
 use crate::configuration::Configuration;
-use crate::physic::bounding_polygon::BoundingPolygon;
-use crate::physic::collision::Collider;
-use crate::physic::collision::Intersects;
+use crate::physic::collision::Collision;
+use crate::physic::collision::collider::Collider;
+use crate::physic::collision::polygon::PolygonCollider;
 use crate::physic::solid::Solid;
 use crate::weapon::Weapon;
 
@@ -25,18 +25,16 @@ pub struct Tank {
 
 #[derive(Bundle)]
 pub struct TankBundle {
-    collider: Collider,
-    intersects: Intersects,
+    collider: Collision,
     solid: Solid,
     sprite: Sprite,
     tank: Tank,
-    transform: Transform,
     weapon: Weapon,
 }
 
 impl TankBundle {
     pub fn new(spawn_location: Transform, sprite: Sprite) -> TankBundle {
-        let collider = BoundingPolygon::new(Box::new([
+        let collider = PolygonCollider::new(Box::new([
             Vec2::new(-25., -25.),
             Vec2::new(-25., 25.),
             Vec2::new(0., 50.),
@@ -44,8 +42,7 @@ impl TankBundle {
             Vec2::new(25., -25.),
         ]));
         TankBundle {
-            collider: Collider::Polygon(collider),
-            intersects: Intersects::default(),
+            collider: Collision::new(Collider::Polygon(collider), spawn_location),
             solid: Solid {},
             sprite,
             tank: Tank {
@@ -54,7 +51,6 @@ impl TankBundle {
                 last_time_killed: 0.,
                 spawn_location,
             },
-            transform: spawn_location,
             weapon: Weapon::default(),
         }
     }

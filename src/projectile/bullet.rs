@@ -2,9 +2,9 @@ use bevy::prelude::*;
 
 use crate::configuration::Configuration;
 use crate::configuration::resolution::Resolution;
-use crate::physic::bounding_circle::BoundingCircle;
-use crate::physic::collision::Collider;
-use crate::physic::collision::Intersects;
+use crate::physic::collision::Collision;
+use crate::physic::collision::circle::CircleCollider;
+use crate::physic::collision::collider::Collider;
 use crate::physic::velocity::Velocity;
 use crate::projectile::Projectile;
 
@@ -14,11 +14,9 @@ pub struct Bullet {}
 #[derive(Bundle)]
 pub struct BulletBundle {
     bullet: Bullet,
-    collider: Collider,
-    intersects: Intersects,
+    collider: Collision,
     projectile: Projectile,
     sprite: Sprite,
-    transform: Transform,
     velocity: Velocity,
 }
 
@@ -31,7 +29,7 @@ impl BulletBundle {
         resolution: &Res<Resolution>,
     ) -> BulletBundle {
         let bullet_texture = assets_server.load("ammunition/bullet.png");
-        let collider = BoundingCircle {
+        let collider = CircleCollider {
             radius: 5.,
             center: tank_position.translation.xy(),
         };
@@ -42,11 +40,9 @@ impl BulletBundle {
         let velocity = configuration.bullet_speed * direction;
         BulletBundle {
             bullet: Bullet {},
-            collider: Collider::Circle(collider),
-            intersects: Intersects::default(),
+            collider: Collision::new(Collider::Circle(collider), spawn_location),
             projectile: Projectile {},
             sprite: Sprite::from_image(bullet_texture),
-            transform: spawn_location,
             velocity: Velocity(velocity),
         }
     }

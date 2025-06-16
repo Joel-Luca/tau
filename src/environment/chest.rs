@@ -1,9 +1,9 @@
 use bevy::prelude::*;
 
 use crate::configuration::resolution::Resolution;
-use crate::physic::bounding_polygon::BoundingPolygon;
-use crate::physic::collision::Collider;
-use crate::physic::collision::Intersects;
+use crate::physic::collision::Collision;
+use crate::physic::collision::collider::Collider;
+use crate::physic::collision::polygon::PolygonCollider;
 use crate::weapon::Weapon;
 
 #[derive(Component)]
@@ -14,10 +14,8 @@ pub struct Chest {
 #[derive(Bundle)]
 pub struct ChestBundle {
     chest: Chest,
-    collider: Collider,
-    intersects: Intersects,
+    collider: Collision,
     sprite: Sprite,
-    transform: Transform,
 }
 
 impl ChestBundle {
@@ -28,14 +26,13 @@ impl ChestBundle {
     ) -> ChestBundle {
         let weapon = Weapon::random();
         let chest_texture = assets_server.load(weapon.get_asset_name());
-        let collider = BoundingPolygon::new(Box::new([]));
+        let collider = PolygonCollider::new(Box::new([]));
+        let spwan_location = Transform::from_translation(position)
+            .with_scale(Vec3::splat(resolution.chest_pixel_ratio));
         ChestBundle {
             chest: Chest { weapon },
-            collider: Collider::Polygon(collider),
-            intersects: Intersects::default(),
+            collider: Collision::new(Collider::Polygon(collider), spwan_location),
             sprite: Sprite::from_image(chest_texture),
-            transform: Transform::from_translation(position)
-                .with_scale(Vec3::splat(resolution.chest_pixel_ratio)),
         }
     }
 }

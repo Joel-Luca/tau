@@ -5,9 +5,9 @@ use bevy::prelude::*;
 use crate::ability::hide::Hide;
 use crate::configuration::Configuration;
 use crate::configuration::resolution::Resolution;
-use crate::physic::bounding_circle::BoundingCircle;
-use crate::physic::collision::Collider;
-use crate::physic::collision::Intersects;
+use crate::physic::collision::Collision;
+use crate::physic::collision::circle::CircleCollider;
+use crate::physic::collision::collider::Collider;
 use crate::projectile::Projectile;
 
 #[derive(Component)]
@@ -15,13 +15,11 @@ pub struct Mine {}
 
 #[derive(Bundle)]
 pub struct MineBundle {
-    collider: Collider,
+    collider: Collision,
     hide: Hide,
-    intersects: Intersects,
     mine: Mine,
     projectile: Projectile,
     sprite: Sprite,
-    transform: Transform,
 }
 
 impl MineBundle {
@@ -33,7 +31,7 @@ impl MineBundle {
         resolution: &Res<Resolution>,
     ) -> MineBundle {
         let mine_texture = assets_server.load("ammunition/mine.png");
-        let collider = BoundingCircle {
+        let collider = CircleCollider {
             radius: 20.,
             center: tank_position.translation.xy(),
         };
@@ -42,16 +40,14 @@ impl MineBundle {
         let spawn_location = Transform::from_translation(position)
             .with_scale(Vec3::splat(resolution.mine_pixel_ratio));
         MineBundle {
-            collider: Collider::Circle(collider),
+            collider: Collision::new(Collider::Circle(collider), spawn_location),
             hide: Hide {
                 spawn_time,
                 visible_duration: configuration.mine_visible_duration,
             },
-            intersects: Intersects::default(),
             mine: Mine {},
             projectile: Projectile {},
             sprite: Sprite::from_image(mine_texture),
-            transform: spawn_location,
         }
     }
 }
