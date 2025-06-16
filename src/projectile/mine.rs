@@ -1,11 +1,13 @@
-use bevy::prelude::*;
 use std::time::SystemTime;
+
+use bevy::prelude::*;
 
 use crate::ability::hide::Hide;
 use crate::configuration::Configuration;
 use crate::configuration::resolution::Resolution;
 use crate::physic::bounding_circle::BoundingCircle;
-use crate::physic::collision::{Collider, Intersects};
+use crate::physic::collision::Collider;
+use crate::physic::collision::Intersects;
 use crate::projectile::Projectile;
 
 #[derive(Component)]

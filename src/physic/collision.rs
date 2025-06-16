@@ -1,4 +1,5 @@
-use bevy::{color::palettes::css::*, prelude::*};
+use bevy::color::palettes::css::*;
+use bevy::prelude::*;
 
 use crate::configuration::controls::Controls;
 use crate::physic::bounding_circle::BoundingCircle;

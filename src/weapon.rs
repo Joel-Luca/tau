@@ -1,7 +1,8 @@
+use std::time::SystemTime;
+
 use bevy::prelude::*;
 use rand;
 use rand::Rng;
-use std::time::SystemTime;
 
 use crate::configuration::Configuration;
 use crate::configuration::resolution::Resolution;

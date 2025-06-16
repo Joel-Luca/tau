@@ -4,7 +4,8 @@ use crate::configuration::Configuration;
 use crate::configuration::resolution::Resolution;
 use crate::physic::bounce::Bounce;
 use crate::physic::bounding_circle::BoundingCircle;
-use crate::physic::collision::{Collider, Intersects};
+use crate::physic::collision::Collider;
+use crate::physic::collision::Intersects;
 use crate::physic::velocity::Velocity;
 use crate::projectile::Projectile;
 

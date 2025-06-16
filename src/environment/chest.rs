@@ -1,8 +1,10 @@
+use bevy::prelude::*;
+
 use crate::configuration::resolution::Resolution;
 use crate::physic::bounding_polygon::BoundingPolygon;
-use crate::physic::collision::{Collider, Intersects};
+use crate::physic::collision::Collider;
+use crate::physic::collision::Intersects;
 use crate::weapon::Weapon;
-use bevy::prelude::*;
 
 #[derive(Component)]
 pub struct Chest {

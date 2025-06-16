@@ -2,7 +2,8 @@ use bevy::prelude::*;
 
 use crate::configuration::Configuration;
 use crate::physic::bounding_polygon::BoundingPolygon;
-use crate::physic::collision::{Collider, Intersects};
+use crate::physic::collision::Collider;
+use crate::physic::collision::Intersects;
 use crate::physic::solid::Solid;
 use crate::weapon::Weapon;
 
