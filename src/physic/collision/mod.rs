@@ -5,6 +5,8 @@ use crate::physic::collision::collider::Collider;
 use crate::physic::collision::intersection::Intersection;
 use crate::physic::solid::Solid;
 use crate::player::Player;
+use crate::projectile::Projectile;
+use crate::tank::Tank;
 
 pub mod circle;
 pub mod collider;
@@ -43,14 +45,21 @@ impl Collision {
 }
 
 fn check_player_collision(
-    mut player_query: Query<(Entity, &mut Transform, &Player, &Collider)>,
+    mut player_query: Query<(Entity, &mut Transform, &Player, &Collider, &Tank)>,
     solid_query: Query<(Entity, &Collider), With<Solid>>,
+    projectile_query: Query<&Collider, With<Projectile>>,
 ) {
-    for (player_entity, mut transform, player, player_c) in player_query.iter_mut() {
+    for (player_entity, mut transform, player, player_c, tank) in player_query.iter_mut() {
         for (solid_entity, solid_c) in solid_query.iter() {
             if player_entity.index() != solid_entity.index() && player_c.intersects(solid_c) {
                 player.set_to_last_pos(&mut transform);
                 return;
+            }
+        }
+
+        for projectile_c in projectile_query.iter() {
+            if player_c.intersects(projectile_c) {
+                *transform = tank.spawn_location.clone();
             }
         }
     }
