@@ -36,11 +36,9 @@ impl Collider {
             },
         }
     }
-}
 
-pub fn update_colliders(mut query: Query<(&mut Collider, &Transform)>) {
-    for (mut collider, transform) in query.iter_mut() {
-        match *collider {
+    pub fn update(&mut self, transform: &Transform) {
+        match *self {
             Collider::Polygon(ref mut polygon) => {
                 polygon.update_vertices(transform);
             }
@@ -48,5 +46,11 @@ pub fn update_colliders(mut query: Query<(&mut Collider, &Transform)>) {
                 circle.update_center(transform);
             }
         }
+    }
+}
+
+pub fn update_colliders(mut query: Query<(&mut Collider, &Transform)>) {
+    for (mut collider, transform) in query.iter_mut() {
+        collider.update(&transform);
     }
 }
