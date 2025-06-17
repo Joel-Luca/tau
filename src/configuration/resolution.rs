@@ -24,7 +24,7 @@ fn setup_resolution(mut commands: Commands, window_query: Query<&Window>) {
     commands.insert_resource(Resolution {
         screen_dimensions: Vec2::new(window.width(), window.height()),
         ammunition_pixel_ratio: 0.05,
-        chest_pixel_ratio: 1.,
+        chest_pixel_ratio: 0.05,
         mine_pixel_ratio: 0.05,
         projectile_pixel_ratio: 0.01,
         shuriken_pixel_ratio: 0.05,
