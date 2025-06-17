@@ -34,7 +34,7 @@ impl Weapon {
             Weapon::Mine => weapon_str = "mine",
             Weapon::Shuriken => weapon_str = "shuriken",
         }
-        "chest_".to_string() + weapon_str + ".png"
+        "environment/chest_".to_string() + weapon_str + ".png"
     }
 
     pub fn shoot(
