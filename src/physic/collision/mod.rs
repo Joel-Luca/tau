@@ -32,7 +32,8 @@ pub struct Collision {
 }
 
 impl Collision {
-    pub fn new(collider: Collider, transform: Transform) -> Self {
+    pub fn new(mut collider: Collider, transform: Transform) -> Self {
+        collider.update(&transform);
         Self {
             collider,
             intersection: Intersection::default(),
