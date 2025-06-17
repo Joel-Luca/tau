@@ -1,11 +1,11 @@
 use bevy::prelude::*;
 
-use crate::configuration::Configuration;
 use crate::configuration::resolution::Resolution;
+use crate::configuration::Configuration;
 use crate::physic::bounce::Bounce;
-use crate::physic::collision::Collision;
 use crate::physic::collision::circle::CircleCollider;
 use crate::physic::collision::collider::Collider;
+use crate::physic::collision::Collision;
 use crate::physic::velocity::Velocity;
 use crate::projectile::Projectile;
 
@@ -24,12 +24,12 @@ pub struct ShurikenBundle {
 
 impl ShurikenBundle {
     pub fn new(
-        direction: Vec3,
         tank_position: &Transform,
         assets_server: &Res<AssetServer>,
         configuration: &Res<Configuration>,
         resolution: &Res<Resolution>,
     ) -> ShurikenBundle {
+        let direction = tank_position.rotation * Vec3::Y;
         let shuriken_texture = assets_server.load("ammunition/shuriken.png");
         let collider = CircleCollider {
             radius: 5.,

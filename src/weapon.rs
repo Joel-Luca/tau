@@ -45,11 +45,9 @@ impl Weapon {
         configuration: &Res<Configuration>,
         resolution: &Res<Resolution>,
     ) {
-        let direction = transform.rotation * Vec3::Y;
         match self {
             &Weapon::Bullet => {
                 commands.spawn(BulletBundle::new(
-                    direction,
                     transform,
                     assets_server,
                     configuration,
@@ -67,7 +65,6 @@ impl Weapon {
             }
             &Weapon::Shuriken => {
                 commands.spawn(ShurikenBundle::new(
-                    direction,
                     transform,
                     assets_server,
                     configuration,
