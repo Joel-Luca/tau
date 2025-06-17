@@ -1,9 +1,9 @@
 use bevy::prelude::*;
 
 use crate::configuration::Configuration;
-use crate::physic::collision::Collision;
 use crate::physic::collision::collider::Collider;
 use crate::physic::collision::polygon::PolygonCollider;
+use crate::physic::collision::Collision;
 use crate::physic::solid::Solid;
 use crate::weapon::Weapon;
 
