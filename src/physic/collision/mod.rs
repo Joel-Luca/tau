@@ -49,7 +49,7 @@ fn check_player_collision(
     for (player_entity, mut transform, player, player_c) in player_query.iter_mut() {
         for (solid_entity, solid_c) in solid_query.iter() {
             if player_entity.index() != solid_entity.index() && player_c.intersects(solid_c) {
-                player.reset_pos(&mut transform);
+                player.set_to_last_pos(&mut transform);
                 return;
             }
         }

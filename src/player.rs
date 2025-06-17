@@ -2,10 +2,10 @@ use std::time::SystemTime;
 
 use bevy::prelude::*;
 
-use crate::configuration::Configuration;
 use crate::configuration::controls::Controls;
 use crate::configuration::controls::Movement;
 use crate::configuration::resolution::Resolution;
+use crate::configuration::Configuration;
 use crate::tank::TankBundle;
 use crate::weapon::Weapon;
 
@@ -34,7 +34,7 @@ impl Player {
         }
     }
 
-    pub fn reset_pos(&self, transform: &mut Transform) {
+    pub fn set_to_last_pos(&self, transform: &mut Transform) {
         transform.translation = self.last_pos;
     }
 }
