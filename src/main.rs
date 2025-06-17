@@ -5,7 +5,6 @@ pub mod configuration;
 pub mod enemy;
 pub mod environment;
 pub mod game;
-pub mod pathfinding;
 pub mod physic;
 pub mod player;
 pub mod projectile;
