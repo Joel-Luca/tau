@@ -38,7 +38,7 @@ fn setup_configuration(mut commands: Commands) {
         shuriken_bounce_count: 3,
         shuriken_speed: 1000.,
         spawn_protection: 3.,
-        tank_mine_location: Vec3::new(0., -55., 0.),
-        tank_shoot_location: Vec3::new(0., 55., 0.),
+        tank_mine_location: Vec3::new(0., -60., 0.),
+        tank_shoot_location: Vec3::new(0., 60., 0.),
     })
 }
