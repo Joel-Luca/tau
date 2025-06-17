@@ -1,8 +1,8 @@
 use bevy::prelude::*;
 
-use crate::environment::wall::Wall;
 use crate::physic::bounce::Bounce;
 use crate::physic::collision::collider::Collider;
+use crate::physic::solid::Solid;
 use crate::player::Player;
 
 pub mod bullet;
@@ -13,7 +13,7 @@ pub struct ProjectilePlugin;
 
 impl Plugin for ProjectilePlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(Update, (check_player_collision, check_wall_collision));
+        app.add_systems(Update, (check_player_collision, check_solid_collision));
     }
 }
 
@@ -35,13 +35,13 @@ fn check_player_collision(
     }
 }
 
-fn check_wall_collision(
+fn check_solid_collision(
     mut commands: Commands,
     projectile_query: Query<(Entity, &Collider), (With<Projectile>, Without<Bounce>)>,
-    wall_query: Query<&Collider, With<Wall>>,
+    solid_query: Query<&Collider, With<Solid>>,
 ) {
     for (projectile, projectile_c) in projectile_query.iter() {
-        for wall_c in wall_query.iter() {
+        for wall_c in solid_query.iter() {
             if projectile_c.intersects(wall_c) {
                 commands.entity(projectile).despawn();
             }

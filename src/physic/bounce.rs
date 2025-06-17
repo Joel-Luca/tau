@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 
-use crate::environment::wall::Wall;
 use crate::physic::collision::collider::Collider;
+use crate::physic::solid::Solid;
 use crate::physic::velocity::Velocity;
 
 pub struct BouncePlugin;
@@ -21,10 +21,10 @@ pub struct Bounce {
 fn apply_bounce(
     mut commands: Commands,
     mut bounce_query: Query<(Entity, &mut Velocity, &mut Bounce, &Collider)>,
-    wall_query: Query<(Entity, &Collider), With<Wall>>,
+    solid_query: Query<(Entity, &Collider), With<Solid>>,
 ) {
     for (entity, mut velocity, mut bounce, bounce_collider) in bounce_query.iter_mut() {
-        for (wall_entity, wall_collider) in wall_query.iter() {
+        for (wall_entity, wall_collider) in solid_query.iter() {
             if bounce_collider.intersects(wall_collider)
                 && bounce.last_bounce.index() != wall_entity.index()
             {
