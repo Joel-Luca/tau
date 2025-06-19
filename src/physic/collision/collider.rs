@@ -4,7 +4,7 @@ use crate::physic::collision::circle::CircleCollider;
 use crate::physic::collision::intersection::IntersectCollider;
 use crate::physic::collision::polygon::PolygonCollider;
 
-#[derive(Component)]
+#[derive(Component, Clone)]
 pub enum Collider {
     Polygon(PolygonCollider),
     Circle(CircleCollider),

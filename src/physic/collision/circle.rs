@@ -3,6 +3,7 @@ use bevy::prelude::*;
 use crate::physic::collision::intersection::IntersectCollider;
 use crate::physic::collision::polygon::PolygonCollider;
 
+#[derive(Clone)]
 pub struct CircleCollider {
     pub radius: f32,
     pub center: Vec2,
