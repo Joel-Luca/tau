@@ -7,14 +7,19 @@ use crate::physic::collision::intersection::IntersectCollider;
 pub struct PolygonCollider {
     pub relative_vertices: Box<[Vec2]>,
     pub vertices: Box<[Vec2]>,
+    pub width: f32,
+    pub height: f32,
 }
 
 impl PolygonCollider {
     pub fn new(vertices: Box<[Vec2]>) -> Self {
         let absolute_vertices = vertices.clone();
+        let (width, height) = PolygonCollider::get_width_and_height(&vertices);
         Self {
             relative_vertices: vertices,
             vertices: absolute_vertices,
+            width,
+            height,
         }
     }
 
@@ -106,6 +111,27 @@ impl PolygonCollider {
             }
         }
         (vec, min)
+    }
+
+    fn get_width_and_height(vertices: &Box<[Vec2]>) -> (f32, f32) {
+        let mut max_x = f32::MIN;
+        let mut min_x = f32::MAX;
+        let mut max_y = f32::MIN;
+        let mut min_y = f32::MAX;
+        for vertex in vertices {
+            if vertex.x > max_x {
+                max_x = vertex.x
+            } else if vertex.x < min_x {
+                min_x = vertex.x
+            }
+
+            if vertex.y > max_y {
+                max_y = vertex.y
+            } else if vertex.y < min_y {
+                min_y = vertex.y
+            }
+        }
+        ((max_x - min_x).abs(), (max_y - min_y).abs())
     }
 }
 

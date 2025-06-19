@@ -6,6 +6,8 @@ use crate::physic::collision::polygon::PolygonCollider;
 pub struct CircleCollider {
     pub radius: f32,
     pub center: Vec2,
+    pub width: f32,
+    pub height: f32,
 }
 
 impl CircleCollider {

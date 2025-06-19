@@ -47,6 +47,20 @@ impl Collider {
             }
         }
     }
+
+    pub fn width(&self) -> f32 {
+        match self {
+            Collider::Polygon(polygon) => polygon.width,
+            Collider::Circle(circle) => circle.width,
+        }
+    }
+
+    pub fn height(&self) -> f32 {
+        match self {
+            Collider::Polygon(polygon) => polygon.height,
+            Collider::Circle(circle) => circle.height,
+        }
+    }
 }
 
 pub fn update_colliders(mut query: Query<(&mut Collider, &Transform)>) {
