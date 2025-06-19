@@ -3,11 +3,11 @@ use std::time::SystemTime;
 use bevy::prelude::*;
 
 use crate::ability::hide::Hide;
-use crate::configuration::Configuration;
 use crate::configuration::resolution::Resolution;
-use crate::physic::collision::Collision;
+use crate::configuration::Configuration;
 use crate::physic::collision::circle::CircleCollider;
 use crate::physic::collision::collider::Collider;
+use crate::physic::collision::Collision;
 use crate::projectile::Projectile;
 
 #[derive(Component)]
@@ -31,10 +31,7 @@ impl MineBundle {
         resolution: &Res<Resolution>,
     ) -> MineBundle {
         let mine_texture = assets_server.load("ammunition/mine.png");
-        let collider = CircleCollider {
-            radius: 20.,
-            center: tank_position.translation.xy(),
-        };
+        let collider = CircleCollider::new(20., tank_position.translation.xy());
         let position: Vec3 =
             tank_position.translation + tank_position.rotation * configuration.tank_mine_location;
         let spawn_location = Transform::from_translation(position)
