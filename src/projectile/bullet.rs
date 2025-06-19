@@ -29,10 +29,7 @@ impl BulletBundle {
     ) -> BulletBundle {
         let direction = tank_position.rotation * Vec3::Y;
         let bullet_texture = assets_server.load("ammunition/bullet.png");
-        let collider = CircleCollider {
-            radius: 5.,
-            center: tank_position.translation.xy(),
-        };
+        let collider = CircleCollider::new(5., tank_position.translation.xy());
         let position: Vec3 =
             tank_position.translation + tank_position.rotation * configuration.tank_shoot_location;
         let spawn_location = Transform::from_translation(position)

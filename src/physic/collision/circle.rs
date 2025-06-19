@@ -11,6 +11,16 @@ pub struct CircleCollider {
 }
 
 impl CircleCollider {
+    pub fn new(radius: f32, center: Vec2) -> Self {
+        let d = radius * 2.;
+        Self {
+            radius,
+            center,
+            width: d,
+            height: d,
+        }
+    }
+
     pub fn update_center(&mut self, transform: &Transform) {
         self.center = transform.translation.xy();
     }
